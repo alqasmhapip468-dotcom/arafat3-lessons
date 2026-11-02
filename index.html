@@ -109,12 +109,8 @@ async function ask(){
   const btn=$("#askbtn"), ans=$("#ans"); btn.disabled=true; btn.textContent="جارٍ التفكير…"; ans.style.display="block"; ans.textContent="…";
   ans.textContent="جارٍ التفكير…";
   try{
-    let sys="أنت مساعد دراسة لطلاب الباكالوريا الموريتانية (شعبة الآداب العصرية). أجب بالعربية الواضحة المبسطة وبدقة، مباشرة دون مقدمات طويلة.";
-    if(current.subject!=="اللغة العربية" && current.text) sys+=" الطالب يدرس درس «"+current.title+"» في مادة "+current.subject+". اعتمد على نص الدرس التالي من الكتاب الرسمي:\n"+current.text.slice(0,3500);
-    else sys+=" الطالب يدرس درس «"+current.title+"» في مادة "+current.subject+".";
-    const r=await fetch("https://text.pollinations.ai/openai",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"openai",messages:[{role:"system",content:sys},{role:"user",content:q}]})});
-    const d=await r.json(); const a=d&&d.choices&&d.choices[0]&&d.choices[0].message?d.choices[0].message.content:"";
-    ans.textContent=(a||"").trim()||"لم تصل إجابة، حاول ثانية.";
+    const r=await fetch("https://arafat3.alqasmhapip468.workers.dev/api/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lesson_id:current.id,question:q})});
+    const d=await r.json(); ans.textContent=(d.answer||d.error||"تعذّرت الإجابة الآن، حاول ثانية.").trim();
   }catch(e){ ans.textContent="خدمة الذكاء مشغولة الآن، أعد المحاولة بعد لحظات."; }
   btn.disabled=false; btn.textContent="اسأل";
 }
@@ -122,10 +118,8 @@ async function homeAsk(){
   const q=$("#homeq").value.trim(); if(!q) return;
   const btn=$("#homebtn"), ans=$("#homeans"); btn.disabled=true; btn.textContent="جارٍ التفكير…"; ans.style.display="block"; ans.textContent="…";
   try{
-    const sys="أنت مساعد دراسة لطلاب الباكالوريا الموريتانية (شعبة الآداب العصرية: عربية، فلسفة، فرنسية، تاريخ، جغرافيا، إنجليزية). أجب بالعربية الواضحة المبسطة وبدقة، مباشرة دون مقدمات طويلة.";
-    const r=await fetch("https://text.pollinations.ai/openai",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"openai",messages:[{role:"system",content:sys},{role:"user",content:q}]})});
-    const d=await r.json(); const a=d&&d.choices&&d.choices[0]&&d.choices[0].message?d.choices[0].message.content:"";
-    ans.textContent=(a||"").trim()||"لم تصل إجابة، حاول ثانية.";
+    const r=await fetch("https://arafat3.alqasmhapip468.workers.dev/api/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:q})});
+    const d=await r.json(); ans.textContent=(d.answer||d.error||"تعذّرت الإجابة الآن، حاول ثانية.").trim();
   }catch(e){ ans.textContent="خدمة الذكاء مشغولة الآن، أعد المحاولة بعد لحظات."; }
   btn.disabled=false; btn.textContent="اسأل";
 }
