@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>دروس العصرية — عرفات 3</title>
+<meta name="description" content="اكتب عنوان الدرس: النص الكامل من الكتاب المعتمد، شروحات يوتيوب داخل الموقع، واسأل الذكاء عن أي نقطة. لطلاب الآداب العصرية — باكالوريا عرفات 3.">
+<style>
+:root{--bg:#0b1220;--card:#111a2e;--card2:#0e1626;--line:#1e2c47;--txt:#e8eefc;--mut:#93a4c4;--acc:#4f8cff;--acc2:#22c07a;--warn:#f5b54a}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.7}
+a{color:var(--acc)}
+header{padding:34px 16px 8px;text-align:center}
+header h1{margin:0;font-size:30px;font-weight:800}
+header p{margin:6px 0 0;color:var(--mut);font-size:15px}
+.wrap{max-width:860px;margin:0 auto;padding:14px}
+.searchbox{position:sticky;top:0;background:var(--bg);padding:12px 0;z-index:5}
+.searchbox input{width:100%;padding:16px 18px;font-size:19px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);color:var(--txt);outline:none}
+.searchbox input:focus{border-color:var(--acc)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 10px}
+.chip{padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card2);color:var(--mut);cursor:pointer;font-size:14px}
+.chip.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.sugg{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:none}
+.sugg div{padding:11px 15px;cursor:pointer;border-bottom:1px solid var(--line);font-size:16px}
+.sugg div:last-child{border-bottom:none}
+.sugg div:hover{background:var(--card2)}
+.sugg small{color:var(--mut);margin-inline-start:8px}
+.grid{display:grid;gap:10px}
+.lcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 15px;cursor:pointer}
+.lcard:hover{border-color:var(--acc)}
+.lcard b{font-size:16.5px}
+.lcard small{color:var(--mut);display:block;font-size:13px}
+.tag{display:inline-block;background:var(--card2);border:1px solid var(--line);color:var(--mut);border-radius:999px;padding:1px 10px;font-size:12.5px;margin-inline-end:6px}
+.back{background:none;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:7px 16px;cursor:pointer;font-size:15px;margin-bottom:12px}
+h2.lesson{font-size:23px;margin:4px 0 2px}
+.vid{margin:14px 0}
+.vid iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:12px;background:#000}
+.vid figcaption{color:var(--mut);font-size:13.5px;margin-top:4px}
+.text{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;font-size:17px;white-space:pre-wrap;word-wrap:break-word}
+.note{background:#2a2113;border:1px solid #57451d;color:var(--warn);border-radius:12px;padding:10px 14px;font-size:14.5px;margin:12px 0}
+.ask{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-top:16px}
+.ask h3{margin:0 0 8px;font-size:18px}
+.ask textarea{width:100%;min-height:74px;padding:11px;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--txt);font-size:16px;font-family:inherit}
+.ask button{margin-top:9px;background:var(--acc2);color:#fff;border:0;border-radius:10px;padding:10px 22px;font-size:16px;cursor:pointer}
+.ask button:disabled{opacity:.55}
+.ans{margin-top:12px;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:16px;white-space:pre-wrap;display:none}
+footer{color:var(--mut);text-align:center;font-size:13px;padding:26px 10px 34px}
+.loading{color:var(--mut);text-align:center;padding:22px}
+</style>
+</head>
+<body>
+<header>
+<h1>دروس العصرية — عرفات 3</h1>
+<p>اكتب عنوان الدرس فقط: يظهر لك نصّه الكامل من الكتاب، وشروحاته بالفيديو هنا، واسأل الذكاء عن أي نقطة فيه.</p>
+</header>
+<div class="wrap">
+  <div id="home">
+    <div class="searchbox">
+      <input id="q" type="text" placeholder="مثال: الأمم المتحدة، الحرية، question tags…" autocomplete="off">
+      <div class="sugg" id="sugg"></div>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="grid" id="list"><div class="loading">جارٍ تحميل الدروس…</div></div>
+  </div>
+  <div id="lesson" style="display:none"></div>
+</div>
+<footer>موقع لطلاب الآداب العصرية — سنة الباكالوريا — ثانوية عرفات 3 · النصوص من الكتب الرسمية المعتمدة للشعبة</footer>
+<script>
+let INDEX=[], curFilter="الكل", current=null;
+const $=s=>document.querySelector(s);
+function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+async function load(){
+  const r=await fetch("index.json"); INDEX=await r.json();
+  const subs=["الكل",...new Set(INDEX.map(x=>x.subject))];
+  $("#chips").innerHTML=subs.map(s=>'<button class="chip'+(s===curFilter?" on":"")+'" data-s="'+esc(s)+'">'+esc(s)+"</button>").join("");
+  document.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{curFilter=c.dataset.s;document.querySelectorAll(".chip").forEach(x=>x.classList.toggle("on",x===c));renderList($("#q").value)});
+  renderList("");
+}
+function match(x,q){ if(!q) return true; const n=s=>(s||"").replace(/[إأآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").toLowerCase(); return n(x.title).includes(n(q))||n(x.subject).includes(n(q)); }
+function renderList(q){
+  const items=INDEX.filter(x=>(curFilter==="الكل"||x.subject===curFilter)&&match(x,q));
+  $("#list").innerHTML=items.length?items.map(x=>'<div class="lcard" data-id="'+x.id+'"><b>'+esc(x.title)+'</b><small>'+esc(x.subject)+(x.hasVideo?" · 🎬 شرح بالفيديو":"")+(x.hasText?" · 📖 النص الكامل":"")+"</small></div>").join(""):'<div class="loading">لا دروس مطابقة — جرّب كلمات من عنوان الدرس</div>';
+  document.querySelectorAll(".lcard").forEach(c=>c.onclick=()=>openLesson(c.dataset.id));
+  const sg=$("#sugg");
+  if(q && items.length){ sg.style.display="block"; sg.innerHTML=items.slice(0,7).map(x=>'<div data-id="'+x.id+'">'+esc(x.title)+"<small>"+esc(x.subject)+"</small></div>").join(""); sg.querySelectorAll("div").forEach(d=>d.onclick=()=>openLesson(d.dataset.id)); }
+  else sg.style.display="none";
+}
+$("#q").addEventListener("input",e=>renderList(e.target.value));
+async function openLesson(id){
+  $("#home").style.display="none"; const box=$("#lesson"); box.style.display="block";
+  box.innerHTML='<div class="loading">جارٍ فتح الدرس…</div>'; window.scrollTo(0,0);
+  if(!window._LESSONS){ const lr=await fetch("lessons.json"); window._LESSONS=await lr.json(); } const L=window._LESSONS[id]; current=L;
+  let h='<button class="back" onclick="goHome()">← كل الدروس</button>';
+  h+='<h2 class="lesson">'+esc(L.title)+'</h2><span class="tag">'+esc(L.subject)+"</span>";
+  if(L.note) h+='<div class="note">'+esc(L.note)+"</div>";
+  if(L.videos&&L.videos.length){ h+=L.videos.map(v=>'<figure class="vid"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/'+v.id+'" title="'+esc(v.title)+'" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe><figcaption>🎬 '+esc(v.title)+" — "+esc(v.channel||"")+(v.duration?" · "+esc(v.duration):"")+"</figcaption></figure>").join(""); }
+  if(L.text) h+='<h3>📖 الدرس كاملًا من الكتاب</h3><div class="text">'+esc(L.text)+"</div>";
+  h+='<div class="ask"><h3>🤖 اسأل عن هذا الدرس</h3><textarea id="askq" placeholder="مثال: اشرح لي الفكرة الأساسية، أو لخّص الدرس في نقاط، أو أعطني أسئلة تدريبية بإجاباتها…"></textarea><button id="askbtn">اسأل</button><div class="ans" id="ans"></div></div>';
+  box.innerHTML=h;
+  $("#askbtn").onclick=ask;
+}
+function goHome(){ $("#lesson").style.display="none"; $("#home").style.display="block"; window.scrollTo(0,0); }
+async function ask(){
+  const q=$("#askq").value.trim(); if(!q) return;
+  const btn=$("#askbtn"), ans=$("#ans"); btn.disabled=true; btn.textContent="جارٍ التفكير…"; ans.style.display="block"; ans.textContent="…";
+  ans.textContent="خدمة الإجابة بالذكاء تُفعَّل قريبًا على هذا الرابط — نص الدرس الكامل وشروحات الفيديو أعلاه متاحة الآن.";
+  btn.disabled=false; btn.textContent="اسأل";
+}
+load();
+</script>
+</body>
+</html>
