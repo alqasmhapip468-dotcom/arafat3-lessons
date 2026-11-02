@@ -59,12 +59,16 @@ footer{color:var(--mut);text-align:center;font-size:13px;padding:26px 10px 34px}
       <input id="q" type="text" placeholder="مثال: الأمم المتحدة، الحرية، question tags…" autocomplete="off">
       <div class="sugg" id="sugg"></div>
     </div>
-    <div class="chips" id="chips"></div>
+    <div class="ask" style="margin:0 0 14px"><h3>🤖 اسأل الذكاء عن أي درس أو نقطة</h3>
+<textarea id="homeq" placeholder="مثال: لخّص لي أسباب الحرب الباردة، أو اشرح مفهوم الحرية عند الفلاسفة…"></textarea>
+<button id="homebtn">اسأل</button><div class="ans" id="homeans"></div></div>
+<div class="note">🚧 هذا الموقع ما زال قيد التطوير. لأي استفسار أو اقتراح تواصل مع صاحب الموقع واتساب: <a href="https://wa.me/22227798492" style="color:inherit;text-decoration:underline">27798492</a></div>
+<div class="chips" id="chips"></div>
     <div class="grid" id="list"><div class="loading">جارٍ تحميل الدروس…</div></div>
   </div>
   <div id="lesson" style="display:none"></div>
 </div>
-<footer>موقع لطلاب الآداب العصرية — سنة الباكالوريا — ثانوية عرفات 3 · النصوص من الكتب الرسمية المعتمدة للشعبة</footer>
+<footer>موقع لطلاب الآداب العصرية — سنة الباكالوريا — ثانوية عرفات 3 · النصوص من الكتب الرسمية المعتمدة للشعبة · الموقع قيد التطوير — للاستفسار أو اقتراح: واتساب <a href="https://wa.me/22227798492">27798492</a></footer>
 <script>
 let INDEX=[], curFilter="الكل", current=null;
 const $=s=>document.querySelector(s);
@@ -93,9 +97,9 @@ async function openLesson(id){
   let h='<button class="back" onclick="goHome()">← كل الدروس</button>';
   h+='<h2 class="lesson">'+esc(L.title)+'</h2><span class="tag">'+esc(L.subject)+"</span>";
   if(L.note) h+='<div class="note">'+esc(L.note)+"</div>";
+  h+='<div class="ask"><h3>🤖 اسأل عن هذا الدرس</h3><textarea id="askq" placeholder="مثال: اشرح لي الفكرة الأساسية، أو لخّص الدرس في نقاط، أو أعطني أسئلة تدريبية بإجاباتها…"></textarea><button id="askbtn">اسأل</button><div class="ans" id="ans"></div></div>';
   if(L.videos&&L.videos.length){ h+=L.videos.map(v=>'<figure class="vid"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/'+v.id+'" title="'+esc(v.title)+'" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe><figcaption>🎬 '+esc(v.title)+" — "+esc(v.channel||"")+(v.duration?" · "+esc(v.duration):"")+"</figcaption></figure>").join(""); }
   if(L.text) h+='<h3>📖 الدرس كاملًا من الكتاب</h3><div class="text">'+esc(L.text)+"</div>";
-  h+='<div class="ask"><h3>🤖 اسأل عن هذا الدرس</h3><textarea id="askq" placeholder="مثال: اشرح لي الفكرة الأساسية، أو لخّص الدرس في نقاط، أو أعطني أسئلة تدريبية بإجاباتها…"></textarea><button id="askbtn">اسأل</button><div class="ans" id="ans"></div></div>';
   box.innerHTML=h;
   $("#askbtn").onclick=ask;
 }
@@ -103,9 +107,29 @@ function goHome(){ $("#lesson").style.display="none"; $("#home").style.display="
 async function ask(){
   const q=$("#askq").value.trim(); if(!q) return;
   const btn=$("#askbtn"), ans=$("#ans"); btn.disabled=true; btn.textContent="جارٍ التفكير…"; ans.style.display="block"; ans.textContent="…";
-  ans.textContent="خدمة الإجابة بالذكاء تُفعَّل قريبًا على هذا الرابط — نص الدرس الكامل وشروحات الفيديو أعلاه متاحة الآن.";
+  ans.textContent="جارٍ التفكير…";
+  try{
+    let sys="أنت مساعد دراسة لطلاب الباكالوريا الموريتانية (شعبة الآداب العصرية). أجب بالعربية الواضحة المبسطة وبدقة، مباشرة دون مقدمات طويلة.";
+    if(current.subject!=="اللغة العربية" && current.text) sys+=" الطالب يدرس درس «"+current.title+"» في مادة "+current.subject+". اعتمد على نص الدرس التالي من الكتاب الرسمي:\n"+current.text.slice(0,3500);
+    else sys+=" الطالب يدرس درس «"+current.title+"» في مادة "+current.subject+".";
+    const r=await fetch("https://text.pollinations.ai/openai",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"openai",messages:[{role:"system",content:sys},{role:"user",content:q}]})});
+    const d=await r.json(); const a=d&&d.choices&&d.choices[0]&&d.choices[0].message?d.choices[0].message.content:"";
+    ans.textContent=(a||"").trim()||"لم تصل إجابة، حاول ثانية.";
+  }catch(e){ ans.textContent="خدمة الذكاء مشغولة الآن، أعد المحاولة بعد لحظات."; }
   btn.disabled=false; btn.textContent="اسأل";
 }
+async function homeAsk(){
+  const q=$("#homeq").value.trim(); if(!q) return;
+  const btn=$("#homebtn"), ans=$("#homeans"); btn.disabled=true; btn.textContent="جارٍ التفكير…"; ans.style.display="block"; ans.textContent="…";
+  try{
+    const sys="أنت مساعد دراسة لطلاب الباكالوريا الموريتانية (شعبة الآداب العصرية: عربية، فلسفة، فرنسية، تاريخ، جغرافيا، إنجليزية). أجب بالعربية الواضحة المبسطة وبدقة، مباشرة دون مقدمات طويلة.";
+    const r=await fetch("https://text.pollinations.ai/openai",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"openai",messages:[{role:"system",content:sys},{role:"user",content:q}]})});
+    const d=await r.json(); const a=d&&d.choices&&d.choices[0]&&d.choices[0].message?d.choices[0].message.content:"";
+    ans.textContent=(a||"").trim()||"لم تصل إجابة، حاول ثانية.";
+  }catch(e){ ans.textContent="خدمة الذكاء مشغولة الآن، أعد المحاولة بعد لحظات."; }
+  btn.disabled=false; btn.textContent="اسأل";
+}
+document.getElementById("homebtn").onclick=homeAsk;
 load();
 </script>
 </body>
