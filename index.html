@@ -30,7 +30,8 @@ header p{margin:6px 0 0;color:var(--mut);font-size:15px}
 .unit{font-size:15.5px;font-weight:700;color:var(--mut);margin:14px 0 8px}
 .unit b{color:var(--txt)}
 .grid{display:grid;gap:10px}
-.lcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 15px;cursor:pointer;border-inline-start:4px solid var(--acc)}
+.lcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 15px;cursor:pointer;border-inline-start:4px solid var(--acc);transition:border-color .15s,transform .15s}
+.sec{scroll-margin-top:70px}
 .lcard:hover{border-color:var(--acc)}
 .lcard b{font-size:16.5px}
 .lcard small{color:var(--mut);display:block;font-size:13px}
@@ -193,8 +194,9 @@ function blocksHTML(blocks,cc){
 function openLesson(id){
   $("#home").style.display="none"; var box=$("#lesson"); box.style.display="block"; $("#prog").style.display="block";
   box.innerHTML='<div class="loading">جارٍ فتح الدرس…</div>'; window.scrollTo(0,0);
-  var done=function(L){ if(!L){ box.innerHTML='<button class="back" onclick="goHome()">← كل الدروس</button><div class="loading">تعذّر فتح الدرس — حاول ثانية</div>'; return } CACHE[id]=L; current=L; renderLesson(L) };
+  var done=function(L){ if(!L){ box.innerHTML='<button class="back" onclick="goHome()">← كل الدروس</button><div class="loading">تعذّر فتح الدرس — حاول ثانية</div>'; return } CACHE[id]=L; try{ sessionStorage.setItem("les:"+id,JSON.stringify(L)) }catch(e){} current=L; renderLesson(L) };
   if(CACHE[id]){ done(CACHE[id]); return }
+  try{ var _s=sessionStorage.getItem("les:"+id); if(_s){ done(JSON.parse(_s)); return } }catch(e){}
   var ctl=("AbortController" in window)?new AbortController():null; var to=ctl?setTimeout(function(){ctl.abort()},9000):null;
   fetch(API+"/api/lesson/"+encodeURIComponent(id), ctl?{signal:ctl.signal}:undefined).then(function(r){ if(to)clearTimeout(to); if(!r.ok)throw 0; return r.json() }).then(done).catch(function(){
     if(FALLBACK){ if(window._LESSONS){ done(window._LESSONS[id]) } else { fetch(FALLBACK).then(function(r){return r.json()}).then(function(d){window._LESSONS=d; done(d[id])}).catch(function(){done(null)}) } }
@@ -206,7 +208,7 @@ function renderLesson(L){
   var h='<button class="back" onclick="goHome()">← كل الدروس</button>';
   h+='<h2 class="lesson">'+esc(L.title)+'</h2><span class="tag">'+esc(L.subject)+"</span>"+(L.unit?'<span class="tag" style="border-color:'+cc+';color:'+cc+'">الوحدة: '+esc(L.unit)+"</span>":"");
   if(L.note) h+='<div class="note">'+esc(L.note)+"</div>";
-  h+='<div class="acts"><button id="pdfb">⬇ تحميل الدرس PDF</button><button id="sumb">🎯 لخّص الدرس</button><button id="ptsb">📌 النقاط الأساسية للحفظ</button></div><div class="aiout" id="aiout"></div>';
+  h+='<div class="acts"><button id="pdfb">⬇ ورقة مراجعة PDF — صفحة واحدة</button><button id="sumb">🎯 لخّص الدرس</button><button id="ptsb">📌 النقاط الأساسية للحفظ</button></div><div class="aiout" id="aiout"></div>';
   h+='<div class="ask" style="margin-top:6px"><h3>🤖 اسأل عن هذا الدرس</h3><textarea id="askq" placeholder="مثال: اشرح لي الفكرة الأساسية، أو ما الفرق بين…؟"></textarea><button class="btn" id="askbtn">اسأل</button><div class="ans" id="ans"></div></div>';
   if(L.videos&&L.videos.length){ h+=L.videos.map(function(v){return '<figure class="vid"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/'+v.id+'" title="'+esc(v.title)+'" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe><figcaption>🎬 '+esc(v.title)+" — "+esc(v.channel||"")+(v.duration?" · "+esc(v.duration):"")+"</figcaption></figure>"}).join("") }
   if(L.text) h+="<h3>📖 الدرس من الكتاب — مقسمًا لأقسام</h3>"+blocksHTML(parseText(L.text),cc);
@@ -215,8 +217,8 @@ function renderLesson(L){
   box.innerHTML=h;
   $("#askbtn").onclick=ask;
   $("#pdfb").onclick=printLesson;
-  $("#sumb").onclick=function(){aiHelp("لخّص هذا الدرس في فقرة واحدة قصيرة لا تتجاوز 6 أسطر بلغة بسيطة وواضحة.")};
-  $("#ptsb").onclick=function(){aiHelp("استخرج من هذا الدرس النقاط الأساسية التي يجب على الطالب حفظها للباكالوريا، على شكل قائمة مرقمة من 5 إلى 8 نقاط قصيرة.")};
+  $("#sumb").onclick=function(){aiHelp("لخّص هذا الدرس في فقرة واحدة قصيرة لا تتجاوز 6 أسطر بلغة بسيطة وواضحة.",380)};
+  $("#ptsb").onclick=function(){aiHelp("استخرج من هذا الدرس النقاط الأساسية التي يجب على الطالب حفظها للباكالوريا، على شكل قائمة مرقمة من 5 إلى 8 نقاط قصيرة.",550)};
   $("#exb").onclick=genExercise;
   box.querySelectorAll(".toc button").forEach(function(b){ b.onclick=function(){ var el=document.getElementById("sec"+b.getAttribute("data-sec")); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}) } });
 }
@@ -224,15 +226,31 @@ function goHome(){ $("#lesson").style.display="none"; $("#home").style.display="
 window.addEventListener("scroll",function(){ if($("#prog").style.display!=="block")return; var d=document.documentElement; var p=d.scrollTop/(d.scrollHeight-d.clientHeight||1); $("#prog").style.width=(p*100)+"%" });
 function askAI(payload,ansEl,btn){
   btn.disabled=true; var old=btn.textContent; btn.textContent="جارٍ التفكير…"; ansEl.style.display="block"; ansEl.textContent="جارٍ التفكير…";
-  return fetch(API+"/api/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}).then(function(r){return r.json()}).then(function(d){ var t=(d.answer||d.error||"تعذّرت الإجابة الآن، حاول ثانية.").trim(); ansEl.textContent=t; btn.disabled=false; btn.textContent=old; return t }).catch(function(){ ansEl.textContent="خدمة الذكاء مشغولة الآن، أعد المحاولة بعد لحظات."; btn.disabled=false; btn.textContent=old; return "" });
+  payload.stream=true;
+  return fetch(API+"/api/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}).then(function(r){
+    var ct=r.headers.get("Content-Type")||"";
+    if(ct.indexOf("event-stream")>=0&&r.body&&r.body.getReader){
+      var reader=r.body.getReader(), dec=new TextDecoder(), buf="", full="";
+      ansEl.textContent="";
+      function pump(){ return reader.read().then(function(res){
+        if(res.done){ btn.disabled=false; btn.textContent=old; return full }
+        buf+=dec.decode(res.value,{stream:true});
+        var parts=buf.split(/\n/); buf=parts.pop();
+        parts.forEach(function(ln){ ln=ln.trim(); if(ln.indexOf("data:")!==0)return; var js=ln.slice(5).trim(); if(js==="[DONE]")return; try{ var o=JSON.parse(js); if(o.response){ full+=o.response; ansEl.textContent=full } }catch(e){} });
+        return pump();
+      }).catch(function(){ btn.disabled=false; btn.textContent=old; return full }) }
+      return pump();
+    }
+    return r.json().then(function(d){ var t=(d.answer||d.error||"تعذّرت الإجابة الآن، حاول ثانية.").trim(); ansEl.textContent=t; btn.disabled=false; btn.textContent=old; return t });
+  }).catch(function(){ ansEl.textContent="خدمة الذكاء مشغولة الآن، أعد المحاولة بعد لحظات."; btn.disabled=false; btn.textContent=old; return "" });
 }
-function ask(){ var q=$("#askq").value.trim(); if(!q)return; askAI({lesson_id:current.id,question:q},$("#ans"),$("#askbtn")) }
-function homeAsk(){ var q=$("#homeq").value.trim(); if(!q)return; askAI({question:q},$("#homeans"),$("#homebtn")) }
-function aiHelp(prompt){ askAI({lesson_id:current.id,question:prompt},$("#aiout"),$("#sumb")) }
+function ask(){ var q=$("#askq").value.trim(); if(!q)return; askAI({lesson_id:current.id,question:q,max_tokens:700},$("#ans"),$("#askbtn")) }
+function homeAsk(){ var q=$("#homeq").value.trim(); if(!q)return; askAI({question:q,max_tokens:700},$("#homeans"),$("#homebtn")) }
+function aiHelp(prompt,tok){ askAI({lesson_id:current.id,question:prompt,max_tokens:tok||500},$("#aiout"),$("#sumb")) }
 function genExercise(){
   var out=$("#exout"), btn=$("#exb"); btn.disabled=true; btn.textContent="جارٍ إعداد التمرين…"; out.innerHTML='<div class="loading">…</div>';
   var prompt="أعدّ تمرينًا على هذا الدرس بصيغة صارمة جدًا وبدون أي كلام إضافي: أربعة أسئلة قصيرة، يبدأ كل سؤال بسطر يبدأ بـ«س:» وتتبعه مباشرة إجابته النموذجية المختصرة في سطر يبدأ بـ«ج:». ثم سؤال مقالي واحد يبدأ بسطر «س:» وإجابته النموذجية في 3 أو 4 أسطر تبدأ بسطر «ج:». لا مقدمات ولا عناوين ولا ترقيم.";
-  fetch(API+"/api/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lesson_id:current.id,question:prompt})}).then(function(r){return r.json()}).then(function(d){
+  fetch(API+"/api/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lesson_id:current.id,question:prompt,max_tokens:850})}).then(function(r){return r.json()}).then(function(d){
     btn.disabled=false; btn.textContent="ولّد تمرينًا آخر";
     var txt=(d.answer||"").trim();
     if(!txt){ out.innerHTML='<div class="loading">تعذّر توليد التمرين الآن — حاول ثانية</div>'; return }
@@ -244,24 +262,51 @@ function genExercise(){
     out.querySelectorAll(".show").forEach(function(b){ b.onclick=function(){ var qa=b.parentNode.querySelector(".qa"); var open=qa.style.display==="block"; qa.style.display=open?"none":"block"; b.textContent=open?"أظهر الإجابة النموذجية":"إخفاء الإجابة" } });
   }).catch(function(){ btn.disabled=false; btn.textContent="ولّد التمرين"; out.innerHTML='<div class="loading">حدث خطأ في الاتصال — حاول ثانية</div>' });
 }
-function printHTML(L){
-  var blocks=parseText(L.text||""), b="";
-  blocks.forEach(function(x){
-    if(x.t==="plan") b+='<p class="plan">خطة الدرس: '+x.x.map(esc).join(" · ")+"</p>";
-    else if(x.t==="goals"&&x.x.length) b+='<div class="goals"><b>أهداف الدرس:</b><ul>'+x.x.map(function(i){return "<li>"+esc(i)+"</li>"}).join("")+"</ul></div>";
-    else if(x.t==="h") b+="<h3>"+esc(x.x)+"</h3>";
-    else if(x.t==="p") b+="<p>"+esc(x.x)+"</p>";
-    else if(x.t==="ul") b+="<ul>"+x.x.map(function(i){return "<li>"+esc(i)+"</li>"}).join("")+"</ul>";
+var SHEET_CACHE={};
+var SHEET_PROMPT="أعدّ ورقة مراجعة مركّزة لهذا الدرس تصلح لصفحة A4 واحدة فقط، وكن موجزًا جدًا والتزم بهذه الصيغة حرفيًا دون أي كلام إضافي: سطر «## التعريف» ثم فقرة تعريف قصيرة (سطران كحد أقصى). ثم سطر «## أهم النقاط» ثم من 5 إلى 7 نقاط قصيرة يبدأ كل منها بـ«- ». ثم سطر «## شرح موجز» ثم فقرة من 4 أو 5 أسطر تشرح الفكرة الجوهرية بأسلوب مبسط. ثم سطر «## سؤال متوقع في الباك» ثم سؤال واحد وإجابته النموذجية في سطرين.";
+function sheetBody(txt){
+  var b="", inUl=false, heads=0;
+  function closeUl(){ if(inUl){ b+="</ul>"; inUl=false } }
+  (txt||"").split(/\n/).forEach(function(raw){
+    var s=raw.trim(); if(!s)return;
+    if(/^##\s*/.test(s)){ closeUl(); heads++; b+="<h3>"+esc(s.replace(/^##\s*/,""))+"</h3>"; return }
+    if(/^[-•]\s+/.test(s)){ if(!inUl){ b+="<ul>"; inUl=true } b+="<li>"+esc(s.replace(/^[-•]\s+/,""))+"</li>"; return }
+    closeUl(); b+="<p>"+esc(s)+"</p>";
   });
-  if(L.videos&&L.videos.length) b+="<h3>شروحات بالفيديو (على الموقع)</h3><ul>"+L.videos.map(function(v){return "<li>"+esc(v.title)+" — https://youtu.be/"+v.id+"</li>"}).join("")+"</ul>";
-  var css="body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;color:#1a2332;line-height:1.9;margin:28px;font-size:14.5px}h1{font-size:21px;margin:4px 0}h3{font-size:16.5px;color:#20508f;margin:16px 0 5px;border-bottom:1px solid #dbe4f0;padding-bottom:3px}p{margin:6px 0}ul{margin:5px 0}.hd{display:flex;justify-content:space-between;align-items:center;border-bottom:2.5px solid #20508f;padding-bottom:7px;color:#20508f;font-weight:700;font-size:14px}.hd small{font-weight:400;color:#66788f}.meta{color:#66788f;font-size:12.5px;margin-top:3px}.goals{background:#f2f7f2;border:1px solid #cbdfcb;border-radius:8px;padding:8px 14px;margin:10px 0}.plan{color:#44546a;background:#f4f7fb;border-radius:8px;padding:6px 12px}.ft{margin-top:26px;border-top:1px solid #d5dde8;padding-top:6px;text-align:center;color:#8a97a8;font-size:10.5px}@page{margin:14mm}";
-  return '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>'+esc(L.title)+'</title><style>'+css+'</style></head><body><div class="hd"><span>دروس العصرية — عرفات 3</span><small>الآداب العصرية · باكالوريا</small></div><h1>'+esc(L.title)+'</h1><div class="meta">'+esc(L.subject)+(L.unit?" · الوحدة: "+esc(L.unit):"")+'</div>'+b+'<div class="ft">دروس العصرية · ثانوية عرفات 3 · النص من الكتاب الرسمي المعتمد · للاستفسار أو اقتراح: 27798492</div></body></html>';
+  closeUl();
+  if(heads===0) b="<h3>أهم ما في الدرس</h3>"+b;
+  return b;
+}
+function fallbackSheet(L){
+  var blocks=parseText(L.text||""), parts=["## أهم النقاط"];
+  blocks.forEach(function(x){
+    if(x.t==="goals") x.x.slice(0,6).forEach(function(g){ parts.push("- "+g) });
+    if(x.t==="plan") parts.push("خطة الدرس: "+x.x.join("، "));
+  });
+  var firstP=blocks.filter(function(x){return x.t==="p"})[0];
+  if(firstP){ parts.push("## شرح موجز"); parts.push(firstP.x.slice(0,600)) }
+  return parts.join("\n");
+}
+function sheetHTML(L,txt){
+  var css="body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;color:#1a2332;line-height:1.75;margin:0;font-size:13.8px}h1{font-size:20px;margin:5px 0 2px}h3{font-size:15.5px;color:#20508f;margin:13px 0 4px;border-bottom:1px solid #dbe4f0;padding-bottom:2px}p{margin:5px 0}ul{margin:4px 0;padding-inline-start:20px}li{margin:3px 0}.hd{display:flex;justify-content:space-between;align-items:center;border-bottom:2.5px solid #20508f;padding-bottom:6px;color:#20508f;font-weight:700;font-size:13.5px}.hd small{font-weight:400;color:#66788f}.meta{color:#66788f;font-size:12px}.ft{margin-top:18px;border-top:1px solid #d5dde8;padding-top:5px;text-align:center;color:#8a97a8;font-size:10.5px}@page{size:A4;margin:13mm}";
+  return '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>ورقة مراجعة: '+esc(L.title)+'</title><style>'+css+'</style></head><body><div class="hd"><span>دروس العصرية — عرفات 3</span><small>ورقة مراجعة · صفحة واحدة</small></div><h1>'+esc(L.title)+'</h1><div class="meta">'+esc(L.subject)+(L.unit?" · الوحدة: "+esc(L.unit):"")+'</div>'+sheetBody(txt)+'<div class="ft">دروس العصرية · ثانوية عرفات 3 · ملخص مُعدّ من نص الكتاب الرسمي المعتمد · للاستفسار أو اقتراح: 27798492</div></body></html>';
+}
+function openSheet(txt){
+  var w=window.open("","_blank");
+  if(!w){ alert("اسمح بالنوافذ المنبثقة لتحميل الورقة"); return }
+  w.document.write(sheetHTML(current,txt)); w.document.close(); w.focus();
+  setTimeout(function(){ w.print() },700);
 }
 function printLesson(){
-  var w=window.open("","_blank");
-  if(!w){ alert("اسمح بالنوافذ المنبثقة لتحميل الدرس"); return }
-  w.document.write(printHTML(current)); w.document.close(); w.focus();
-  setTimeout(function(){ w.print() },700);
+  var btn=$("#pdfb"), L=current;
+  if(SHEET_CACHE[L.id]){ openSheet(SHEET_CACHE[L.id]); return }
+  btn.disabled=true; var old=btn.textContent; btn.textContent="جارٍ إعداد ورقة المراجعة… ثوانٍ";
+  fetch(API+"/api/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lesson_id:L.id,question:SHEET_PROMPT,max_tokens:800})}).then(function(r){return r.json()}).then(function(d){
+    btn.disabled=false; btn.textContent=old;
+    var txt=(d.answer||"").trim();
+    if(txt.length>120){ SHEET_CACHE[L.id]=txt; openSheet(txt) }
+    else openSheet(fallbackSheet(L));
+  }).catch(function(){ btn.disabled=false; btn.textContent=old; openSheet(fallbackSheet(L)) });
 }
 document.getElementById("homebtn").onclick=homeAsk;
 load();
