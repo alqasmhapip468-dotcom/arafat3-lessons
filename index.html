@@ -207,7 +207,10 @@ function parseText(text){
     if(pendingBullet){ addItem(s); pendingBullet=false; started=true; continue }
     if(!started&&blocks.length===0&&!para.length&&/[–-]$/.test(s)&&s.length<=48){ plan.push(s.replace(/[–-]$/,"").trim()); continue }
     if(/^الأهداف/.test(s)||/يكون التلميذ في نهاية الدرس قادرا/.test(s)){ fp(); fl(); blocks.push({t:"goals",x:[]}); goalsOpen=true; started=true; continue }
-    var isH=(s.length>=4&&s.length<=74&&s.split(/\s+/).length<=9&&s.indexOf("?")<0&&s.indexOf("؟")<0&&!/،\s*و/.test(s)&&!/^(دعت|جاء|وقد|قال|يقول|حيث|كما أن|لذلك قرر)/.test(s)&&(/[:：]$/.test(s)&&!/^(وقد|وقام|ثم|لكن|حيث|كما|لذلك|غير أن|إلا أن)/.test(s)||/^(مقدمة|خاتمة|تمهيد|مدخل|المحور|المبحث|أولا|أولاً|ثانيا|ثانياً|ثالثا|ثالثاً|رابعا|رابعاً|خامسا|خامساً|سادسا|سابعا|سابعاً)[:\s]/.test(s)||(/^[0-9١-٩]+\s*[-.)،]\s*\S/.test(s)&&(/[:：]$/.test(s)||s.length>=20))));
+    var SEC1=/^(مقدمة|خاتمة|تمهيد|العرض|الدعامات|تعريف|مفهوم|نشأة|أهداف|مبادئ|هياكل|خصائص|أسباب|نتائج|عوامل|أنواع|أقسام|مظاهر|أهمية|الحرية|الشخصية|الدولة|المعرفة|الوجودية|البنيوية|الوضعية|الظاهراتية)$/;
+    var words=s.split(/\s+/).length;
+    var badH=(s.length<=3&&s!=="العرض")||(words===1&&!SEC1.test(s.replace(/[:：]$/,"")))||/^(من|في|عن|على|إلى|بين|عند|كما|وقد|ثم)\s/.test(s);
+    var isH=(!badH&&s.length>=4&&s.length<=74&&words<=9&&s.indexOf("?")<0&&s.indexOf("؟")<0&&!/،\s*و/.test(s)&&!/^(دعت|جاء|وقد|قال|يقول|حيث|كما أن|لذلك قرر)/.test(s)&&(/[:：]$/.test(s)&&!/^(وقد|وقام|ثم|لكن|حيث|كما|لذلك|غير أن|إلا أن)/.test(s)||/^(مقدمة|خاتمة|تمهيد|مدخل|المحور|المبحث|أولا|أولاً|ثانيا|ثانياً|ثالثا|ثالثاً|رابعا|رابعاً|خامسا|خامساً|سادسا|سابعا|سابعاً)[:\s]/.test(s)||(/^[0-9١-٩]+\s*[-.)،]\s*\S/.test(s)&&(/[:：]$/.test(s)||s.length>=20))));
     if(isH){ fp(); fl(); goalsOpen=false; blocks.push({t:"h",x:s.replace(/[:：]$/,"")}); started=true; continue }
     if(/^[-–•·]\s+\S/.test(s)){ addItem(s.replace(/^[-–•·]\s+/,"")); started=true; continue }
     goalsOpen=false; fl(); para.push(s); started=true;
