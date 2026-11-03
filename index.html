@@ -79,6 +79,25 @@ footer{color:var(--mut);text-align:center;font-size:13px;padding:26px 10px 34px}
 .ex .qa{display:none;margin-top:8px;border-top:1px dashed var(--line);padding-top:8px;color:#bfe9d2;font-size:15.5px;white-space:pre-wrap}
 .ex .show{background:none;border:1px solid var(--acc2);color:var(--acc2);border-radius:999px;padding:4px 14px;font-size:14px;cursor:pointer;margin-top:8px}
 .more{width:100%;margin-top:4px}
+.s8{border:1px solid var(--line);border-inline-start:4px solid var(--c,#888);border-radius:14px;margin:18px 0;background:#101827;overflow:hidden}
+.s8>h3{margin:0;padding:11px 16px;color:var(--c);font-size:17px;background:rgba(255,255,255,.03);border-bottom:1px solid var(--line)}
+.s8 .s8b{padding:12px 16px}
+.s8 .s8b>p:first-child{margin-top:0}.s8 .s8b>p:last-child{margin-bottom:0}
+.s8 .goalsbox{background:rgba(45,212,191,.07);border:1px dashed rgba(45,212,191,.4);border-radius:10px;padding:10px 14px;margin-top:10px}
+.s8 .goalsbox b{color:#2dd4bf}
+.axcard{display:flex;gap:10px;align-items:flex-start;background:#0d1522;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0;cursor:pointer}
+.axcard .n{background:#a78bfa;color:#0b1220;font-weight:800;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex:none}
+.axcard small{display:block;color:var(--mut);margin-top:2px}
+.axdet{border:1px solid var(--line);border-radius:12px;margin:12px 0;overflow:hidden}
+.axdet>h4{margin:0;padding:9px 14px;background:rgba(255,255,255,.04);font-size:16px}
+.axdet .axb{padding:10px 14px}
+.keylist{list-style:none;padding:0;margin:0}
+.keylist li{padding:7px 0 7px;border-bottom:1px dashed var(--line)}
+.keylist li:last-child{border-bottom:0}
+.keylist li:before{content:"✓ ";color:#22c07a;font-weight:800}
+.qcard{background:#0d1522;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:9px 0}
+.qcard .qq{font-weight:700}
+
 #sheetov{position:fixed;inset:0;background:rgba(4,8,16,.86);z-index:80;overflow:auto;padding:16px 6px 34px;display:none}
 .scalewrap{margin:0 auto;position:relative}
 #sheetA4{position:absolute;top:0;left:0;width:794px;height:1123px;transform-origin:top left;background:#fdfaf3;color:#1d2733;overflow:hidden;border-radius:6px;box-shadow:0 16px 50px rgba(0,0,0,.55);font-size:16px;display:flex;flex-direction:column}
@@ -209,7 +228,7 @@ function parseText(text){
     if(/^الأهداف/.test(s)||/يكون التلميذ في نهاية الدرس قادرا/.test(s)){ fp(); fl(); blocks.push({t:"goals",x:[]}); goalsOpen=true; started=true; continue }
     var SEC1=/^(مقدمة|خاتمة|تمهيد|العرض|الدعامات|تعريف|مفهوم|نشأة|أهداف|مبادئ|هياكل|خصائص|أسباب|نتائج|عوامل|أنواع|أقسام|مظاهر|أهمية|الحرية|الشخصية|الدولة|المعرفة|الوجودية|البنيوية|الوضعية|الظاهراتية)$/;
     var words=s.split(/\s+/).length;
-    var badH=(s.length<=3&&s!=="العرض")||(words===1&&!SEC1.test(s.replace(/[:：]$/,"")))||/^(من|في|عن|على|إلى|بين|عند|كما|وقد|ثم)\s/.test(s);
+    var badH=/[\u0600-\u06FF]/.test(s)? ((s.length<=3&&s!=="العرض")||(words===1&&!SEC1.test(s.replace(/[:：]$/,"")))||/^(من|في|عن|على|إلى|بين|عند|كما|وقد|ثم)\s/.test(s)) : (s.length<=2);
     var isH=(!badH&&s.length>=4&&s.length<=74&&words<=9&&s.indexOf("?")<0&&s.indexOf("؟")<0&&!/،\s*و/.test(s)&&!/^(دعت|جاء|وقد|قال|يقول|حيث|كما أن|لذلك قرر)/.test(s)&&(/[:：]$/.test(s)&&!/^(وقد|وقام|ثم|لكن|حيث|كما|لذلك|غير أن|إلا أن)/.test(s)||/^(مقدمة|خاتمة|تمهيد|مدخل|المحور|المبحث|أولا|أولاً|ثانيا|ثانياً|ثالثا|ثالثاً|رابعا|رابعاً|خامسا|خامساً|سادسا|سابعا|سابعاً)[:\s]/.test(s)||(/^[0-9١-٩]+\s*[-.)،]\s*\S/.test(s)&&(/[:：]$/.test(s)||s.length>=20))));
     if(isH){ fp(); fl(); goalsOpen=false; blocks.push({t:"h",x:s.replace(/[:：]$/,"")}); started=true; continue }
     if(/^[-–•·]\s+\S/.test(s)){ addItem(s.replace(/^[-–•·]\s+/,"")); started=true; continue }
@@ -233,6 +252,102 @@ function blocksHTML(blocks,cc){
   if(secOpen)h+="</div>";
   return h;
 }
+function lessonLang(L){ if(!L) return "ar"; if(L.subject==="الفرنسية") return "fr"; if(L.subject==="الإنجليزية") return "en"; return "ar"; }
+function isLatin(L){ return lessonLang(L)!=="ar"; }
+function sheetDir(L){ return isLatin(L)? "ltr":"rtl"; }
+var I18N={
+ar:{intro:"التمهيد والتعريف",map:"الخريطة العامة للدرس",axes:"المحاور الأساسية",detail:"الشرح والتفصيل",examples:"الأمثلة والتطبيقات",key:"أهم المعلومات",quiz:"التقويم والاختبار",outro:"الخلاصة والمراجعة",goals:"🎯 أهداف الدرس:",extracted:"مستخرجة حرفيًا من نص الكتاب",quizBook:"أسئلة التقويم من الكتاب:",modelAns:"الإجابة النموذجية",exTitle:"📝 تمرين ذكاء إضافي من هذا الدرس:",genBtn:"ولّد التمرين",noSum:"لا توجد خلاصة جاهزة في نص الكتاب لهذا الدرس بعد — استخدم ورقة المراجعة أدناه وسيولّد الذكاء خلاصة مركّزة من النص.",sheetBtn:"🖨️ ورقة المراجعة A4 (PDF) — من هذه الخلاصة"},
+fr:{intro:"Introduction et définition",map:"Carte générale du cours",axes:"Axes principaux",detail:"Explication détaillée",examples:"Exemples et applications",key:"Informations essentielles",quiz:"Évaluation et test",outro:"Conclusion et révision",goals:"🎯 Objectifs du cours :",extracted:"Extraites littéralement du texte du manuel",quizBook:"Questions d'évaluation du manuel :",modelAns:"Réponse modèle",exTitle:"📝 Exercice supplémentaire (IA) :",genBtn:"Générer l'exercice",noSum:"Aucune conclusion prête dans le texte du manuel pour ce cours — utilisez la fiche de révision ci-dessous, l'IA générera un résumé concentré à partir du texte.",sheetBtn:"🖨️ Fiche de révision A4 (PDF) — à partir de cette conclusion"},
+en:{intro:"Introduction and definition",map:"Course map",axes:"Main axes",detail:"Detailed explanation",examples:"Examples and applications",key:"Key information",quiz:"Assessment and test",outro:"Summary and review",goals:"🎯 Lesson objectives:",extracted:"Extracted word-for-word from the textbook",quizBook:"Assessment questions from the book:",modelAns:"Model answer",exTitle:"📝 Extra AI exercise from this lesson:",genBtn:"Generate the exercise",noSum:"No ready summary in the textbook for this lesson yet — use the revision sheet below and the AI will generate a focused summary from the text.",sheetBtn:"🖨️ A4 revision sheet (PDF) — from this summary"}};
+var SHEET_I18N={
+ar:{brand:"دروس العصرية — عرفات 3",brandSub:"موقع طلاب الآداب العصرية · ثانوية عرفات 3",tag:"ورقة مراجعة مركّزة · راجع بذكاء وحقق هدفك",def:"التعريف",points:"أهم النقاط",qa:"سؤال متوقع في الباك",sum:"الخلاصة",meta:"دروس العصرية · ثانوية عرفات 3 · ملخص مُعدّ من نص الكتاب الرسمي المعتمد · للاستفسار أو اقتراح: 27798492",hDef:"## التعريف",hPoints:"## أهم النقاط",hSum:"## شرح موجز",hQa:"## سؤال متوقع في الباك"},
+fr:{brand:"Lettres Modernes — Arafat 3",brandSub:"Site des élèves de lettres modernes · Lycée Arafat 3",tag:"Fiche de révision concentrée · Révise intelligemment, atteins ton objectif",def:"Définition",points:"Points essentiels",qa:"Question probable au bac",sum:"Conclusion",meta:"Lettres Modernes · Lycée Arafat 3 · Résumé préparé à partir du manuel officiel · Contact : 27798492",hDef:"## Définition",hPoints:"## Points essentiels",hSum:"## Résumé",hQa:"## Question probable au bac"},
+en:{brand:"Modern Literature — Arafat 3",brandSub:"Students' site · Arafat 3 High School",tag:"Focused revision sheet · Revise smart, reach your goal",def:"Definition",points:"Key points",qa:"Likely exam question",sum:"Summary",meta:"Modern Literature · Arafat 3 High School · Summary prepared from the official textbook · Contact: 27798492",hDef:"## Definition",hPoints:"## Key points",hSum:"## Summary",hQa:"## Likely exam question"}};
+function sheetLabels(L){ return SHEET_I18N[lessonLang(L)]; }
+var SHEET_PROMPT_FR="Prépare une fiche de révision concentrée pour ce cours, tenant sur une seule page A4, très concise, en respectant exactement ce format, sans aucun autre texte, entièrement en français : une ligne «## Définition» puis un court paragraphe de définition (2 lignes maximum). Puis une ligne «## Points essentiels» puis 5 à 6 points courts commençant chacun par «- ». Puis une ligne «## Résumé» puis un paragraphe de 3 à 4 lignes expliquant simplement l'idée centrale. Puis une ligne «## Question probable au bac» puis une question et sa réponse modèle en 2 lignes.";
+var SHEET_PROMPT_EN="Prepare a focused revision sheet for this lesson that fits on a single A4 page, very concise, following exactly this format with no other text, entirely in English: a line «## Definition» then a short definition paragraph (max 2 lines). Then a line «## Key points» then 5 to 6 short points each starting with «- ». Then a line «## Summary» then a 3-4 line paragraph explaining the core idea simply. Then a line «## Likely exam question» then one question and its model answer in 2 lines.";
+function sheetPromptFor(L){ var g=lessonLang(L); return g==="fr"? SHEET_PROMPT_FR : g==="en"? SHEET_PROMPT_EN : SHEET_PROMPT; }
+function blocksToText(bs,max){ var out=[];
+  (bs||[]).forEach(function(b){ if(b.t==="p"||b.t==="h") out.push(b.x); else if(b.t==="ul") out.push(b.x.join("؛ ")); });
+  var s=out.join("\n"); return max&&s.length>max? s.slice(0,max): s; }
+function firstSent(s){ if(!s) return ""; var m=s.replace(/\s+/g," ").match(/^[^.!؟?؛:]{20,180}[.!؟?؛:]/); return m? m[0]: s.slice(0,140); }
+function parseSections(text){ var S={goals:[],plan:[],intro:[],axes:[],examples:[],quiz:[],outro:[]};
+  if(!text) return S;
+  var blocks=parseText(text), cur="intro", ax=null, ex=null;
+  blocks.forEach(function(b){
+    if(b.t==="plan"){ S.plan=b.x; return; }
+    if(b.t==="goals"){ S.goals=b.x; return; }
+    if(b.t==="p"&&/^[IVX]+\s*[\u2013-]\s*(COMPR[\u00c9E]HENSION|EXPRESSION|QUESTIONS|GRAMMAIRE|VOCABULAIRE|LANGUE|[\u00c9E]VALUATION)/i.test(b.x)){ cur="quiz"; S.quiz.push(b); return; }
+    if(b.t==="h"){ var h=b.x;
+      if(h.replace(/[:\uFF1A]$/,"")==="\u0627\u0644\u0639\u0631\u0636") return;
+      if(/تقويم|اختبار ذاتي|اختبر|exercices?|exercises?|questions|compr[ée]hension|[ée]valuation|assessment/i.test(h)&&h.length<48){ cur="quiz"; S.quiz.push(b); ex=null; return; }
+      if(/خاتمة|خلاصة|حصيلة|استنتاجات|الاستنتاج|conclusion|r[ée]sum[ée]|summary|bilan/i.test(h)&&h.length<48){ cur="outro"; ax=null; ex=null; return; }
+      if(/دعام|نص تطبيقي|النص التطبيقي|أمثلة|تطبيقات|وثيق|مقتطف|texte|text|exemple|example|document|application|extrait/i.test(h)){ cur="examples"; ex={h:h,body:[]}; S.examples.push(ex); ax=null; return; }
+      cur="axis"; ax={h:h,body:[]}; S.axes.push(ax); ex=null; return; }
+    if(cur==="axis"&&ax) ax.body.push(b);
+    else if(cur==="examples"&&ex) ex.body.push(b);
+    else if(cur==="quiz") S.quiz.push(b);
+    else if(cur==="outro") S.outro.push(b);
+    else S.intro.push(b);
+  });
+  return S; }
+function deriveKeyinfo(S){ var out=[];
+  S.axes.forEach(function(a){ var t=blocksToText(a.body,900); var fs=firstSent(t); if(fs&&fs.length>=25) out.push(fs); });
+  if(!out.length&&S.outro.length){ blocksToText(S.outro,900).split("\n").forEach(function(l){ if(l.length>=25) out.push(l); }); }
+  return out.slice(0,8); }
+function secWrap(kind,color,icon,title,inner){ if(!inner) return "";
+  return '<section class="s8" style="--c:'+color+'"><h3>'+icon+" "+title+'</h3><div class="s8b">'+inner+"</div></section>"; }
+function sectionsHTML(L){ var S=parseSections(L.text), ai=L.aisec||null; window._SEC=S; window._AI=ai;
+  var T=I18N[lessonLang(L)];
+  var cc=C[L.subject]||"#4f8cff", h="";
+  var introH="";
+  if(ai&&ai.intro) introH+="<p>"+esc(ai.intro)+"</p>";
+  else introH+=blocksHTML(S.intro,cc);
+  if(S.goals.length) introH+='<div class="goalsbox"><b>'+T.goals+'</b><ul>'+S.goals.map(function(g){return "<li>"+esc(g)+"</li>"}).join("")+"</ul></div>";
+  h+=secWrap("intro","#2dd4bf","🧩",T.intro,introH);
+  var axesTitles=(ai&&ai.axes&&ai.axes.length)? ai.axes : S.axes.map(function(a){return a.h});
+  var mapH="";
+  if(S.plan.length) mapH+='<div style="margin-bottom:8px">'+S.plan.map(function(p){return '<span class="planchip">'+esc(p)+"</span>"}).join("")+"</div>";
+  if(axesTitles.length) mapH+="<ol>"+axesTitles.slice(0,12).map(function(t){return "<li>"+esc(t)+"</li>"}).join("")+"</ol>"+(axesTitles.length>12? "<div class=\"src\">… +"+(axesTitles.length-12)+"</div>":"");
+  h+=secWrap("map","#38bdf8","🗺️",T.map,mapH);
+  var axH="";
+  S.axes.slice(0,12).forEach(function(a,i){ var t=(ai&&ai.axes&&ai.axes[i])||a.h; var teaser=firstSent(blocksToText(a.body,600));
+    axH+='<div class="axcard" onclick="document.getElementById(\'ax'+i+'\').scrollIntoView({behavior:\'smooth\'})"><span class="n">'+(i+1)+'</span><div><b>'+esc(t)+"</b>"+(teaser? "<small>"+esc(teaser)+"</small>":"")+"</div></div>"; });
+  h+=secWrap("axes","#a78bfa","🧭",T.axes,axH);
+  var detH="";
+  S.axes.forEach(function(a,i){ var t=(ai&&ai.axes&&ai.axes[i])||a.h;
+    detH+='<div class="axdet" id="ax'+i+'"><h4 style="color:'+cc+'">'+(i+1)+". "+esc(t)+'</h4><div class="axb">'+blocksHTML(a.body,cc)+"</div></div>"; });
+  if(!S.axes.length&&S.intro.length) detH=blocksHTML(S.intro,cc);
+  h+=secWrap("detail",cc,"📖",T.detail,detH);
+  var exH="";
+  S.examples.forEach(function(e){ exH+="<h4>"+esc(e.h)+"</h4>"+blocksHTML(e.body,"#f5a623"); });
+  h+=secWrap("examples","#f5a623","🔍",T.examples,exH);
+  var key=(ai&&ai.keyinfo&&ai.keyinfo.length)? ai.keyinfo : deriveKeyinfo(S); window._KEY=key;
+  var keyH=key.length? '<ul class="keylist">'+key.map(function(k){return "<li>"+esc(k)+"</li>"}).join("")+"</ul>"+((ai&&ai.keyinfo)?"":'<div class="src">'+T.extracted+"</div>") : "";
+  h+=secWrap("key","#22c07a","⭐",T.key,keyH);
+  var qzH="";
+  if(ai&&ai.quiz&&ai.quiz.length){ qzH+=ai.quiz.map(function(q,i){ return '<div class="qcard"><div class="qq">'+esc(q.q)+'</div><button class="mini" onclick="var e=document.getElementById(\'qa'+i+'\');e.style.display=e.style.display===\'none\'?\'block\':\'none\'">'+T.modelAns+'</button><div class="ans" id="qa'+i+'" style="display:none">'+esc(q.a)+"</div></div>"; }).join(""); }
+  else if(S.quiz.length){ qzH+="<b>"+T.quizBook+"</b>"+blocksHTML(S.quiz,"#fb7185"); }
+  qzH+='<div class="ex" style="margin-top:12px"><b>'+T.exTitle+'</b><div style="margin-top:8px"><button class="go" id="exb">'+T.genBtn+'</button></div><div class="ans" id="exout" style="display:none"></div></div>';
+  h+=secWrap("quiz","#fb7185","✍️",T.quiz,qzH);
+  var outH="";
+  if(ai&&ai.summary) outH+="<p>"+esc(ai.summary)+"</p>";
+  else if(S.outro.length) outH+=blocksHTML(S.outro,"#f3c34d");
+  if(!outH) outH='<div class="note">'+T.noSum+"</div>";
+  outH+='<div style="margin-top:12px"><button class="go" onclick="printLesson()">'+T.sheetBtn+"</button></div>";
+  h+=secWrap("outro","#f3c34d","🏆",T.outro,outH);
+  return h; }
+function composeSheet(L){ var ai=window._AI, S=window._SEC; if(!S) return null;
+  var SL=sheetLabels(L);
+  var sum= ai&&ai.summary? ai.summary : blocksToText(S.outro,900);
+  if(!sum||sum.length<40) return null;
+  var def= ai&&ai.intro? ai.intro : blocksToText(S.intro,450);
+  var pts= (ai&&ai.keyinfo&&ai.keyinfo.length)? ai.keyinfo : (window._KEY||[]);
+  if(pts.length<2) return null;
+  var qa="";
+  if(ai&&ai.quiz&&ai.quiz.length) qa=ai.quiz[0].q+"\n"+ai.quiz[0].a;
+  return SL.hDef+"\n"+def+"\n"+SL.hPoints+"\n"+pts.map(function(p){return "- "+p}).join("\n")+"\n"+SL.hSum+"\n"+sum+"\n"+SL.hQa+"\n"+qa; }
+
 function openLesson(id){
   $("#home").style.display="none"; var box=$("#lesson"); box.style.display="block"; $("#prog").style.display="block";
   box.innerHTML='<div class="loading">جارٍ فتح الدرس…</div>'; window.scrollTo(0,0);
@@ -253,9 +368,8 @@ function renderLesson(L){
   h+='<div class="acts"><button id="pdfb">⬇ ورقة مراجعة PDF — صفحة واحدة</button><button id="sumb">🎯 لخّص الدرس</button><button id="ptsb">📌 النقاط الأساسية للحفظ</button></div><div class="aiout" id="aiout"></div>';
   h+='<div class="ask" style="margin-top:6px"><h3>🤖 اسأل عن هذا الدرس</h3><textarea id="askq" placeholder="مثال: اشرح لي الفكرة الأساسية، أو ما الفرق بين…؟"></textarea><button class="btn" id="askbtn">اسأل</button><div class="ans" id="ans"></div></div>';
   if(L.videos&&L.videos.length){ h+=L.videos.map(function(v){return '<figure class="vid"><iframe loading="lazy" src="https://www.youtube-nocookie.com/embed/'+v.id+'" title="'+esc(v.title)+'" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen></iframe><figcaption>🎬 '+esc(v.title)+" — "+esc(v.channel||"")+(v.duration?" · "+esc(v.duration):"")+"</figcaption></figure>"}).join("") }
-  if(L.text) h+="<h3>📖 الدرس من الكتاب — مقسمًا لأقسام</h3>"+blocksHTML(parseText(L.text),cc);
+  if(L.text) h+=sectionsHTML(L);
   else h+='<div class="note">نص هذا الدرس غير متوفر بعد في الكتاب المعتمد — الشرح بالفيديو متاح أعلاه، ويمكنك سؤال الذكاء عنه.</div>';
-  h+='<div class="ex"><h3>✍️ تمرين الدرس — اختبر نفسك</h3><p style="color:var(--mut);margin:2px 0">أسئلة قصيرة من هذا الدرس بإجابات نموذجية مخفية: حاول الإجابة أولًا ثم قارن.</p><button class="btn" id="exb">ولّد التمرين</button><div id="exout"></div></div>';
   box.innerHTML=h;
   $("#askbtn").onclick=ask;
   $("#pdfb").onclick=printLesson;
@@ -308,14 +422,14 @@ function genExercise(){
 }
 var SHEET_CACHE={};
 var SHEET_PROMPT="أعدّ ورقة مراجعة مركّزة لهذا الدرس تصلح لصفحة A4 واحدة فقط، وكن موجزًا جدًا والتزم بهذه الصيغة حرفيًا دون أي كلام إضافي: سطر «## التعريف» ثم فقرة تعريف قصيرة (سطران كحد أقصى). ثم سطر «## أهم النقاط» ثم من 5 إلى 6 نقاط قصيرة يبدأ كل منها بـ«- ». ثم سطر «## شرح موجز» ثم فقرة من 3 أو 4 أسطر تشرح الفكرة الجوهرية بأسلوب مبسط. ثم سطر «## سؤال متوقع في الباك» ثم سؤال واحد وإجابته النموذجية في سطرين.";
-function sheetStore(id,txt){ SHEET_CACHE[id]=txt; try{ localStorage.setItem("sheet2:"+id,txt) }catch(e){} }
-function sheetGet(id){ if(SHEET_CACHE[id])return SHEET_CACHE[id]; try{ return localStorage.getItem("sheet2:"+id)||null }catch(e){ return null } }
+function sheetStore(id,txt){ SHEET_CACHE[id]=txt; try{ localStorage.setItem("sheet3:"+id,txt) }catch(e){} }
+function sheetGet(id){ if(SHEET_CACHE[id])return SHEET_CACHE[id]; try{ return localStorage.getItem("sheet3:"+id)||null }catch(e){ return null } }
 function parseSheet(txt){
   var S={def:"",points:[],sum:"",qa:""}, cur=null;
   (txt||"").split(/\n/).forEach(function(raw){
     var s=raw.trim(); if(!s)return;
     if(/^##\s*/.test(s)){ var h=s.replace(/^##\s*/,"");
-      if(/تعريف|مفهوم/.test(h))cur="def"; else if(/نقاط/.test(h))cur="points"; else if(/شرح|خلاصة|موجز/.test(h))cur="sum"; else if(/سؤال/.test(h))cur="qa"; else cur=null;
+      if(/تعريف|مفهوم|d[ée]finition|definition/i.test(h))cur="def"; else if(/نقاط|points|key/i.test(h))cur="points"; else if(/شرح|خلاصة|موجز|r[ée]sum[ée]|summary|explication/i.test(h))cur="sum"; else if(/سؤال|question/i.test(h))cur="qa"; else cur=null;
       return }
     if(cur==="points"){ S.points.push(s.replace(/^[-•]\s+/,"")); return }
     if(cur){ S[cur]+=(S[cur]?"\n":"")+s }
@@ -334,20 +448,21 @@ function fallbackSheet(L){
   return parts.join("\n");
 }
 function renderSheet(L,txt){
-  var S=parseSheet(txt), cc="#152a4e";
+  var S=parseSheet(txt), SL=sheetLabels(L);
   var pts=S.points.length?S.points.map(function(p){return '<div class="ni"><span class="n2"></span><span>'+esc(p)+"</span></div>"}).join(""):"<p>—</p>";
   var defP=S.def?S.def.split(/\n/).map(function(p){return "<p>"+esc(p)+"</p>"}).join(""):"<p>—</p>";
   var qaB=S.qa?S.qa.split(/\n/).map(function(p,i){return i===0?("<p><b>"+esc(p)+"</b></p>"):("<p>"+esc(p)+"</p>")}).join(""):"<p>—</p>";
   var sumP=S.sum?esc(S.sum).replace(/\n/g,"<br>"):"—";
-  return '<div id="sheetA4">'
-  +'<div class="sa-band"><div class="sa-top"><div class="sa-brand">دروس العصرية — عرفات 3<small>موقع طلاب الآداب العصرية · ثانوية عرفات 3</small></div><div style="text-align:left"><span class="sa-pill">'+esc(L.subject)+'</span>'+(L.unit?'<div style="margin-top:.45em"><span class="sa-pill sa-pill2">'+esc(L.unit)+"</span></div>":"")+'</div></div>'
-  +'<div class="sa-title">'+esc(L.title)+'</div><div class="sa-tag">ورقة مراجعة مركّزة · راجع بذكاء وحقق هدفك</div></div>'
+  return '<div id="sheetA4" dir="'+sheetDir(L)+'">'
+  +'<div class="sa-band"><div class="sa-top"><div class="sa-brand">'+SL.brand+"<small>"+SL.brandSub+'</small></div><div style="text-align:left"><span class="sa-pill">'+esc(L.subject)+"</span>"+(L.unit?'<div style="margin-top:.45em"><span class="sa-pill sa-pill2">'+esc(L.unit)+"</span></div>":"")+"</div></div>"
+  +'<div class="sa-title">'+esc(L.title)+'</div><div class="sa-tag">'+SL.tag+"</div></div>"
   +'<div class="sa-body"><div class="sa-grid">'
-  +'<div class="sa-card"><div class="ch">💡 التعريف</div><div class="cb">'+defP+"</div></div>"
-  +'<div class="sa-card"><div class="ch">📚 أهم النقاط</div><div class="cb sa-nums">'+pts+"</div></div>"
-  +'</div><div class="sa-card"><div class="ch">🎯 سؤال متوقع في الباك</div><div class="cb sa-qa">'+qaB+"</div></div></div>"
-  +'<div class="sa-foot"><div class="fh">🏆 الخلاصة</div><div class="fb">'+sumP+"</div></div>"
-  +'<div class="sa-meta">دروس العصرية · ثانوية عرفات 3 · ملخص مُعدّ من نص الكتاب الرسمي المعتمد · للاستفسار أو اقتراح: 27798492</div></div>';
+  +'<div class="sa-card"><div class="ch">💡 '+SL.def+'</div><div class="cb">'+defP+"</div></div>"
+  +'<div class="sa-card"><div class="ch">📚 '+SL.points+'</div><div class="cb sa-nums">'+pts+"</div></div>"
+  +"</div>"
+  +'<div class="sa-card"><div class="ch">🎯 '+SL.qa+'</div><div class="cb sa-qa">'+qaB+"</div></div></div>"
+  +'<div class="sa-foot"><div class="fh">🏆 '+SL.sum+'</div><div class="fb">'+sumP+"</div></div>"
+  +'<div class="sa-meta">'+SL.meta+"</div></div>";
 }
 function fitSheet(){
   var ov=$("#sheetov"), el=document.getElementById("sheetA4"), wrap=document.getElementById("scalewrap");
@@ -362,7 +477,7 @@ function fitSheet(){
 function showSheet(txt){
   var ov=$("#sheetov");
   if(!ov){ ov=document.createElement("div"); ov.id="sheetov"; document.body.appendChild(ov) }
-  ov.innerHTML='<div class="scalewrap" id="scalewrap" dir="ltr"><div dir="rtl" style="position:absolute;top:0;left:0">'+renderSheet(current,txt)+'</div></div><div class="sheetbtns"><button class="dl" id="shdl">⬇ حمّل PDF</button><button class="cl" id="shcl">إغلاق</button><button class="pr" id="shpr">أو اطبعها</button></div>';
+  ov.innerHTML='<div class="scalewrap" id="scalewrap" dir="ltr"><div dir="'+sheetDir(current)+'" style="position:absolute;top:0;left:0">'+renderSheet(current,txt)+'</div></div><div class="sheetbtns"><button class="dl" id="shdl">⬇ حمّل PDF</button><button class="cl" id="shcl">إغلاق</button><button class="pr" id="shpr">أو اطبعها</button></div>';
   ov.style.display="block"; ov.scrollTop=0; document.body.style.overflow="hidden";
   requestAnimationFrame(fitSheet);
   $("#shcl").onclick=closeSheet;
@@ -400,7 +515,7 @@ function downloadSheetPDF(){
   });
 }
 function fetchSheet(L){
-  return fetch(API+"/api/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lesson_id:L.id,question:SHEET_PROMPT,max_tokens:850})}).then(function(r){return r.json()}).then(function(d){
+  return fetch(API+"/api/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lesson_id:L.id,question:sheetPromptFor(L),max_tokens:850})}).then(function(r){return r.json()}).then(function(d){
     var txt=stripCJ((d.answer||"").trim());
     if(txt.length>120){ sheetStore(L.id,txt); return txt }
     return fallbackSheet(L);
@@ -411,6 +526,7 @@ function printLesson(){
   var cached=sheetGet(L.id);
   if(cached){ showSheet(cached); return }
   btn.disabled=true; var old=btn.textContent; btn.textContent="جارٍ إعداد ورقة المراجعة… ثوانٍ";
+  var composed=composeSheet(L); if(composed){ sheetStore(L.id,composed); btn.disabled=false; btn.textContent=old; showSheet(composed); return }
   fetchSheet(L).then(function(txt){ btn.disabled=false; btn.textContent=old; showSheet(txt) });
 }
 
