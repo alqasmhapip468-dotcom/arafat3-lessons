@@ -299,7 +299,7 @@ function secWrap(kind,color,icon,title,inner){ if(!inner) return "";
   return '<section class="s8" style="--c:'+color+'"><h3>'+icon+" "+title+'</h3><div class="s8b">'+inner+"</div></section>"; }
 function sectionsHTML(L){ var S=parseSections(L.text), ai=L.aisec||null; window._SEC=S; window._AI=ai;
   var T=I18N[lessonLang(L)];
-  var cc=C[L.subject]||"#4f8cff", h="";
+  var cc=col(L.subject), h="";
   var introH="";
   if(ai&&ai.intro) introH+="<p>"+esc(ai.intro)+"</p>";
   else introH+=blocksHTML(S.intro,cc);
