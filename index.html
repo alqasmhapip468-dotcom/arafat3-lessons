@@ -349,7 +349,7 @@ function downloadSheetPDF(){
       var pdf=new window.jspdf.jsPDF({unit:"mm",format:"a4",orientation:"portrait"});
       var pw=210, ph=297, iw=pw, ih=canvas.height*iw/canvas.width, x=0;
       if(ih>ph){ ih=ph; iw=canvas.width*ih/canvas.height; x=(pw-iw)/2 }
-      pdf.addImage(canvas.toDataURL("image/png"),"PNG",x,0,iw,ih);
+      pdf.addImage(canvas.toDataURL("image/jpeg",0.88),"JPEG",x,0,iw,ih);
       pdf.save("arafat3-"+current.id+".pdf");
       btn.disabled=false; btn.textContent="تم التحميل ✓ حمّل ثانية";
     });
