@@ -224,6 +224,7 @@ function renderLesson(L){
 }
 function goHome(){ $("#lesson").style.display="none"; $("#home").style.display="block"; $("#prog").style.display="none"; window.scrollTo(0,0) }
 window.addEventListener("scroll",function(){ if($("#prog").style.display!=="block")return; var d=document.documentElement; var p=d.scrollTop/(d.scrollHeight-d.clientHeight||1); $("#prog").style.width=(p*100)+"%" });
+function stripCJ(s){ return (s||"").replace(/[㐀-䶿一-鿿豈-﫿぀-ヿ가-힯]/g,"").replace(/([.؟!])\s*،\s*/g,"$1 ") }
 function askAI(payload,ansEl,btn){
   btn.disabled=true; var old=btn.textContent; btn.textContent="جارٍ التفكير…"; ansEl.style.display="block"; ansEl.textContent="جارٍ التفكير…";
   payload.stream=true;
@@ -236,12 +237,12 @@ function askAI(payload,ansEl,btn){
         if(res.done){ btn.disabled=false; btn.textContent=old; return full }
         buf+=dec.decode(res.value,{stream:true});
         var parts=buf.split(/\n/); buf=parts.pop();
-        parts.forEach(function(ln){ ln=ln.trim(); if(ln.indexOf("data:")!==0)return; var js=ln.slice(5).trim(); if(js==="[DONE]")return; try{ var o=JSON.parse(js); if(o.response){ full+=o.response; ansEl.textContent=full } }catch(e){} });
+        parts.forEach(function(ln){ ln=ln.trim(); if(ln.indexOf("data:")!==0)return; var js=ln.slice(5).trim(); if(js==="[DONE]")return; try{ var o=JSON.parse(js); if(o.response){ full+=stripCJ(o.response); ansEl.textContent=full } }catch(e){} });
         return pump();
       }).catch(function(){ btn.disabled=false; btn.textContent=old; return full }) }
       return pump();
     }
-    return r.json().then(function(d){ var t=(d.answer||d.error||"تعذّرت الإجابة الآن، حاول ثانية.").trim(); ansEl.textContent=t; btn.disabled=false; btn.textContent=old; return t });
+    return r.json().then(function(d){ var t=stripCJ((d.answer||d.error||"تعذّرت الإجابة الآن، حاول ثانية.").trim()); ansEl.textContent=t; btn.disabled=false; btn.textContent=old; return t });
   }).catch(function(){ ansEl.textContent="خدمة الذكاء مشغولة الآن، أعد المحاولة بعد لحظات."; btn.disabled=false; btn.textContent=old; return "" });
 }
 function ask(){ var q=$("#askq").value.trim(); if(!q)return; askAI({lesson_id:current.id,question:q,max_tokens:700},$("#ans"),$("#askbtn")) }
@@ -252,7 +253,7 @@ function genExercise(){
   var prompt="أعدّ تمرينًا على هذا الدرس بصيغة صارمة جدًا وبدون أي كلام إضافي: أربعة أسئلة قصيرة، يبدأ كل سؤال بسطر يبدأ بـ«س:» وتتبعه مباشرة إجابته النموذجية المختصرة في سطر يبدأ بـ«ج:». ثم سؤال مقالي واحد يبدأ بسطر «س:» وإجابته النموذجية في 3 أو 4 أسطر تبدأ بسطر «ج:». لا مقدمات ولا عناوين ولا ترقيم.";
   fetch(API+"/api/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lesson_id:current.id,question:prompt,max_tokens:850})}).then(function(r){return r.json()}).then(function(d){
     btn.disabled=false; btn.textContent="ولّد تمرينًا آخر";
-    var txt=(d.answer||"").trim();
+    var txt=stripCJ((d.answer||"").trim());
     if(!txt){ out.innerHTML='<div class="loading">تعذّر توليد التمرين الآن — حاول ثانية</div>'; return }
     var items=[], cur=null;
     txt.split(/\n/).forEach(function(ln){ ln=ln.trim(); if(!ln)return; if(/^س\s*[:：]/.test(ln)){ cur={q:ln.replace(/^س\s*[:：]\s*/,""),a:""}; items.push(cur) } else if(/^ج\s*[:：]/.test(ln)&&cur){ cur.a=ln.replace(/^ج\s*[:：]\s*/,"") } else if(cur&&cur.a){ cur.a+="\n"+ln } else if(cur){ cur.q+=" "+ln } });
@@ -304,7 +305,7 @@ function printLesson(){
   btn.disabled=true; var old=btn.textContent; btn.textContent="جارٍ إعداد ورقة المراجعة… ثوانٍ";
   fetch(API+"/api/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lesson_id:L.id,question:SHEET_PROMPT,max_tokens:800})}).then(function(r){return r.json()}).then(function(d){
     btn.disabled=false; btn.textContent=old;
-    var txt=(d.answer||"").trim();
+    var txt=stripCJ((d.answer||"").trim());
     if(txt.length>120){ SHEET_CACHE[L.id]=txt; fillSheet(w,txt) }
     else fillSheet(w,fallbackSheet(L));
   }).catch(function(){ btn.disabled=false; btn.textContent=old; fillSheet(w,fallbackSheet(L)) });
