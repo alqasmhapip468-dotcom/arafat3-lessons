@@ -165,6 +165,8 @@ footer{color:var(--mut);text-align:center;font-size:13px;padding:26px 10px 34px}
 <script>
 var INDEX=[], curFilter="الكل", current=null, CACHE={}, SHOWALL=false;
 var API="https://arafat3.alqasmhapip468.workers.dev", INDEX_URL="index.json", FALLBACK="lessons.json";
+var VID=""; try{ VID=localStorage.getItem("vid")||""; if(!VID){ VID="v"+Math.random().toString(36).slice(2,10)+Date.now().toString(36); localStorage.setItem("vid",VID) } }catch(e){}
+try{ if(!sessionStorage.getItem("hit1")){ sessionStorage.setItem("hit1","1"); fetch(API+"/api/hit?v="+encodeURIComponent(VID)).catch(function(){}) } }catch(e){}
 var COLORS={"التاريخ":"#f5a623","الجغرافيا":"#22c07a","الفلسفة":"#a78bfa","اللغة العربية":"#f472b6","الفرنسية":"#4f8cff","الإنجليزية":"#38bdf8"};
 function col(s){return COLORS[s]||"#4f8cff"}
 function $(s){return document.querySelector(s)}
@@ -356,7 +358,7 @@ function openLesson(id){
   if(CACHE[id]){ done(CACHE[id]); return }
   try{ var _s=sessionStorage.getItem("les:"+id); if(_s){ done(JSON.parse(_s)); return } }catch(e){}
   var ctl=("AbortController" in window)?new AbortController():null; var to=ctl?setTimeout(function(){ctl.abort()},9000):null;
-  fetch(API+"/api/lesson/"+encodeURIComponent(id), ctl?{signal:ctl.signal}:undefined).then(function(r){ if(to)clearTimeout(to); if(!r.ok)throw 0; return r.json() }).then(done).catch(function(){
+  fetch(API+"/api/lesson/"+encodeURIComponent(id)+"?v="+encodeURIComponent(VID), ctl?{signal:ctl.signal}:undefined).then(function(r){ if(to)clearTimeout(to); if(!r.ok)throw 0; return r.json() }).then(done).catch(function(){
     if(FALLBACK){ if(window._LESSONS){ done(window._LESSONS[id]) } else { fetch(FALLBACK).then(function(r){return r.json()}).then(function(d){window._LESSONS=d; done(d[id])}).catch(function(){done(null)}) } }
     else done(null);
   });
