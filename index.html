@@ -166,7 +166,8 @@ footer{color:var(--mut);text-align:center;font-size:13px;padding:26px 10px 34px}
 var INDEX=[], curFilter="الكل", current=null, CACHE={}, SHOWALL=false;
 var API="https://arafat3.alqasmhapip468.workers.dev", INDEX_URL="index.json", FALLBACK="lessons.json";
 var VID=""; try{ VID=localStorage.getItem("vid")||""; if(!VID){ VID="v"+Math.random().toString(36).slice(2,10)+Date.now().toString(36); localStorage.setItem("vid",VID) } }catch(e){}
-try{ if(!sessionStorage.getItem("hit1")){ sessionStorage.setItem("hit1","1"); fetch(API+"/api/hit?v="+encodeURIComponent(VID)).catch(function(){}) } }catch(e){}
+var OWN=false; try{ var _q=new URLSearchParams(location.search); if(_q.get("owner")==="4739e0ca8bf00fa8600c"){ localStorage.setItem("own","1"); var _d=document.createElement("div"); _d.textContent="تم تعليم هذا الجهاز: زياراتك لن تُحتسب في إحصاءات الموقع"; _d.style.cssText="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#22c07a;color:#06281a;padding:10px 16px;border-radius:12px;font-weight:700;z-index:9999;box-shadow:0 6px 24px rgba(0,0,0,.4)"; document.body.appendChild(_d); setTimeout(function(){ _d.remove() },5000); history.replaceState(null,"",location.pathname) } OWN=localStorage.getItem("own")==="1" }catch(e){}
+try{ if(!OWN&&!sessionStorage.getItem("hit1")){ sessionStorage.setItem("hit1","1"); fetch(API+"/api/hit?v="+encodeURIComponent(VID)).catch(function(){}) } }catch(e){}
 var COLORS={"التاريخ":"#f5a623","الجغرافيا":"#22c07a","الفلسفة":"#a78bfa","اللغة العربية":"#f472b6","الفرنسية":"#4f8cff","الإنجليزية":"#38bdf8"};
 function col(s){return COLORS[s]||"#4f8cff"}
 function $(s){return document.querySelector(s)}
@@ -358,7 +359,7 @@ function openLesson(id){
   if(CACHE[id]){ done(CACHE[id]); return }
   try{ var _s=sessionStorage.getItem("les:"+id); if(_s){ done(JSON.parse(_s)); return } }catch(e){}
   var ctl=("AbortController" in window)?new AbortController():null; var to=ctl?setTimeout(function(){ctl.abort()},9000):null;
-  fetch(API+"/api/lesson/"+encodeURIComponent(id)+"?v="+encodeURIComponent(VID), ctl?{signal:ctl.signal}:undefined).then(function(r){ if(to)clearTimeout(to); if(!r.ok)throw 0; return r.json() }).then(done).catch(function(){
+  fetch(API+"/api/lesson/"+encodeURIComponent(id)+"?v="+encodeURIComponent(VID)+(OWN?"&own=1":""), ctl?{signal:ctl.signal}:undefined).then(function(r){ if(to)clearTimeout(to); if(!r.ok)throw 0; return r.json() }).then(done).catch(function(){
     if(FALLBACK){ if(window._LESSONS){ done(window._LESSONS[id]) } else { fetch(FALLBACK).then(function(r){return r.json()}).then(function(d){window._LESSONS=d; done(d[id])}).catch(function(){done(null)}) } }
     else done(null);
   });
@@ -405,7 +406,7 @@ function askAI(payload,ansEl,btn){
     return r.json().then(function(d){ var t=stripCJ((d.answer||d.error||"تعذّرت الإجابة الآن، حاول ثانية.").trim()); ansEl.textContent=t; btn.disabled=false; btn.textContent=old; return t });
   }).catch(function(){ ansEl.textContent="خدمة الذكاء مشغولة الآن، أعد المحاولة بعد لحظات."; btn.disabled=false; btn.textContent=old; return "" });
 }
-function ask(){ var q=$("#askq").value.trim(); if(!q)return; askAI({lesson_id:current.id,question:q,max_tokens:1000},$("#ans"),$("#askbtn")) }
+function ask(){ var q=$("#askq").value.trim(); if(!q)return; askAI({lesson_id:current.id,question:q,max_tokens:1000,u:1},$("#ans"),$("#askbtn")) }
 function homeAsk(){ var q=$("#homeq").value.trim(); if(!q)return; askAI({question:q,max_tokens:1000},$("#homeans"),$("#homebtn")) }
 function aiHelp(prompt,tok){ askAI({lesson_id:current.id,question:prompt,max_tokens:tok||500},$("#aiout"),$("#sumb")) }
 function genExercise(){
