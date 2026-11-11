@@ -137,6 +137,77 @@ footer{color:var(--mut);text-align:center;font-size:13px;padding:26px 10px 34px}
   #sheetA4{transform:none!important;position:static;box-shadow:none}
   .scalewrap{width:auto!important;height:auto!important}
 }
+/* ===== جدولي (أضيف 2026-11-11 باعتماد قاسم) ===== */
+#jadwal{background:linear-gradient(150deg,#0a1425,#152a4e 55%,#1d3a66);background-size:200% 200%;animation:jtbg 18s ease infinite;border-radius:22px;padding:18px 14px 26px;position:relative;overflow:hidden;color:#152a4e;margin-bottom:20px}
+@keyframes jtbg{0%,100%{background-position:0% 40%}50%{background-position:100% 60%}}
+.jt-orb{position:absolute;border-radius:50%;filter:blur(55px);opacity:.30;pointer-events:none}
+.jt-orb.a{width:230px;height:230px;background:#4f8cff;top:-70px;left:-50px;animation:jtfl1 11s ease-in-out infinite}
+.jt-orb.b{width:200px;height:200px;background:#a78bfa;bottom:-60px;right:-40px;animation:jtfl2 13s ease-in-out infinite}
+@keyframes jtfl1{0%,100%{transform:translate(0,0)}50%{transform:translate(35px,45px)}}
+@keyframes jtfl2{0%,100%{transform:translate(0,0)}50%{transform:translate(-40px,-35px)}}
+.jt-in{position:relative;z-index:1}
+.jt-back{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:999px;padding:8px 18px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+.jt-head{text-align:center;color:#fff;padding:10px 0 0}
+.jt-head h2{margin:0;font-size:27px;font-weight:800;color:#fff}
+.jt-head h2 .jt-gold{background:linear-gradient(90deg,#f3c34d,#ffe9a8,#f3c34d);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:jtshine 3.5s linear infinite}
+@keyframes jtshine{to{background-position:200% center}}
+.jt-head p{margin:5px 0 0;opacity:.85;font-size:14px}
+.jt-clock{display:inline-flex;align-items:center;gap:7px;margin-top:10px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);color:#fff;padding:5px 14px;border-radius:99px;font-size:15px;font-weight:700;direction:ltr}
+.jt-dotlive{width:8px;height:8px;border-radius:50%;background:#ff5d5d;animation:jtpulse 1.4s ease-in-out infinite}
+@keyframes jtpulse{0%,100%{box-shadow:0 0 0 0 rgba(255,93,93,.55);transform:scale(1)}50%{box-shadow:0 0 0 6px rgba(255,93,93,0);transform:scale(1.15)}}
+.jt-bac{margin:15px 0 0;background:rgba(255,255,255,.08);border:1px solid rgba(243,195,77,.45);color:#fff;border-radius:18px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;overflow:hidden}
+.jt-bac:after{content:"";position:absolute;top:0;left:-80%;width:60%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.16),transparent);animation:jtsweep 4.5s ease-in-out infinite}
+@keyframes jtsweep{0%,55%{left:-80%}90%,100%{left:130%}}
+.jt-bac .num{font-size:33px;font-weight:800;color:#f3c34d;line-height:1}
+.jt-bac .lbl{font-size:13px;opacity:.92}
+.jt-bac .note{font-size:11px;opacity:.65}
+.jt-live{margin-top:13px;background:rgba(255,255,255,.97);border-radius:22px;padding:17px;box-shadow:0 16px 40px rgba(0,0,0,.38);position:relative;overflow:hidden}
+.jt-live:before{content:"";position:absolute;inset:0;background:radial-gradient(420px 180px at 85% -10%,var(--jtglow,rgba(243,195,77,.25)),transparent 70%);pointer-events:none}
+.jt-live .state{font-size:13px;color:#7a8699;font-weight:800;display:flex;align-items:center;gap:7px;position:relative}
+.jt-live .main{display:flex;align-items:center;gap:15px;margin-top:6px;position:relative}
+.jt-ringwrap{position:relative;width:90px;height:90px;flex:0 0 auto}
+.jt-ringwrap svg{transform:rotate(-90deg)}
+.jt-ringbg{fill:none;stroke:#edf0f5;stroke-width:9}
+.jt-ringfg{fill:none;stroke:#f3c34d;stroke-width:9;stroke-linecap:round;transition:stroke-dashoffset 1s linear,stroke .5s}
+.jt-ringtxt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.jt-ringtxt b{font-size:18px;line-height:1}
+.jt-ringtxt span{font-size:10px;color:#7a8699;font-weight:700}
+.jt-live .subj{font-size:31px;font-weight:800;margin:2px 0}
+.jt-live .time{font-size:15px;color:#445;direction:ltr;text-align:right;font-weight:700}
+.jt-live .remain{font-size:13.5px;color:#7a8699;margin-top:3px}
+.jt-timeline{margin-top:20px;position:relative}
+.jt-tl-track{position:relative;height:16px;background:#eef1f6;border-radius:99px}
+.jt-tl-seg{position:absolute;top:0;height:16px;border-radius:99px;opacity:.9}
+.jt-tl-now{position:absolute;top:-6px;width:4px;height:28px;background:#152a4e;border-radius:4px;box-shadow:0 0 0 3px rgba(21,42,78,.18);transition:left 1s linear}
+.jt-tl-now:after{content:"الآن";position:absolute;top:-17px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:800;color:#152a4e}
+.jt-tl-labels{display:flex;justify-content:space-between;font-size:11px;color:#93a0b4;margin-top:6px;direction:ltr;font-weight:700}
+.jt-live .next{margin-top:13px;border-top:1px dashed #e3e8f0;padding-top:11px;font-size:15px;position:relative}
+.jt-tabs{display:flex;gap:6px;margin:16px 0 11px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);padding:5px;border-radius:16px}
+.jt-tabs button{flex:1;border:0;padding:11px 0;border-radius:12px;font-size:16px;font-weight:800;background:transparent;color:#dfe7f3;cursor:pointer;font-family:inherit;transition:all .35s}
+.jt-tabs button.on{background:#f3c34d;color:#152a4e;box-shadow:0 6px 18px rgba(243,195,77,.40)}
+.jt-tabs button:active{transform:scale(.96)}
+.jt-panel{background:rgba(255,255,255,.97);border-radius:20px;padding:13px;box-shadow:0 14px 34px rgba(0,0,0,.30);min-height:110px;position:relative}
+.jt-panel.anim{animation:jtpanelin .45s cubic-bezier(.2,.8,.25,1) both}
+@keyframes jtpanelin{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes jtrise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.jt-row{display:flex;align-items:center;gap:11px;padding:12px;border-radius:16px;margin-bottom:9px;background:#f6f8fc;border:1px solid #e7ecf4;position:relative;overflow:hidden;animation:jtrise .55s cubic-bezier(.2,.8,.25,1) both}
+.jt-row:before{content:"";position:absolute;inset-inline-start:0;top:0;width:5px;height:100%;background:var(--jtrc,#ccc)}
+.jt-row.now{background:#fff8e6;border-color:#f3c34d;box-shadow:0 0 0 2px rgba(243,195,77,.35)}
+.jt-row.past{opacity:.42}
+.jt-dot{width:14px;height:14px;border-radius:50%;flex:0 0 auto}
+.jt-row .s{font-size:18px;font-weight:800;flex:1}
+.jt-row .t{font-size:14px;color:#5b6a82;font-weight:700;direction:ltr}
+.jt-row .tag{font-size:11px;font-weight:800;background:#f3c34d;color:#152a4e;padding:3px 9px;border-radius:99px;animation:jtpulse 1.6s ease-in-out infinite}
+.jt-empty{padding:20px;text-align:center;color:#7a8699;font-size:16px}
+.jt-dayblk{margin-bottom:15px}
+.jt-dayblk h3{margin:0 0 9px;font-size:16px;color:#152a4e;display:flex;align-items:center;gap:8px}
+.jt-dayblk h3 .todaytag{font-size:11px;background:#f3c34d;padding:2px 9px;border-radius:99px;font-weight:800}
+.jt-entry{display:flex;align-items:center;gap:12px;width:100%;text-align:right;background:linear-gradient(135deg,#152a4e,#1d3a66);border:1.5px solid rgba(243,195,77,.55);border-radius:18px;padding:15px 17px;margin:0 0 14px;cursor:pointer;color:#fff;font-family:inherit;box-shadow:0 10px 26px rgba(21,42,78,.35);transition:transform .2s}
+.jt-entry:active{transform:scale(.98)}
+.jt-entry .ic{font-size:30px}
+.jt-entry .tt{font-size:19px;font-weight:800}
+.jt-entry .ds{font-size:13px;opacity:.82;margin-top:2px}
+.jt-entry .arw{margin-inline-start:auto;font-size:22px;color:#f3c34d;font-weight:800}
 </style>
 </head>
 <body>
@@ -156,10 +227,51 @@ footer{color:var(--mut);text-align:center;font-size:13px;padding:26px 10px 34px}
 <button class="btn" id="homebtn">اسأل</button><div class="ans" id="homeans"></div></div>
 <div class="note">🚧 هذا الموقع ما زال قيد التطوير. لأي استفسار أو اقتراح تواصل مع صاحب الموقع واتساب: <a href="https://wa.me/22227798492" style="color:inherit;text-decoration:underline">27798492</a></div>
 <div class="note" style="border:1px solid #f5a62388;background:#f5a62314">⚠️ <b>تنبيه بصراحة:</b> هذا الموقع يعتمد على الكتب المدرسية الرسمية المعتمدة، وينقل نصوص الدروس منها كما هي. قد توجد أخطاء في بعض النصوص، وأي خطأ تجده هنا فهو خطأ موجود في الكتاب الأصلي نفسه، لا خطأ من الموقع.</div>
+<button class="jt-entry" onclick="openJadwal()"><span class="ic">📅</span><span><span class="tt">جدولي — جدول قسم 7A</span><span class="ds" style="display:block">حصص اليوم والغد لحظة بلحظة · عدّاد أيام البكالوريا</span></span><span class="arw">←</span></button>
 <div class="chips" id="chips"></div>
     <div id="list"><div class="loading">جارٍ تحميل الدروس…</div></div>
   </div>
   <div id="lesson" style="display:none"></div>
+  <div id="jadwal" style="display:none">
+    <div class="jt-orb a"></div><div class="jt-orb b"></div>
+    <div class="jt-in">
+      <button class="jt-back" onclick="closeJadwal()">→ عودة إلى الدروس</button>
+      <div class="jt-head">
+        <h2>جدول <span class="jt-gold">قسمي</span> — 7A</h2>
+        <p id="jtTodayLine">—</p>
+        <span class="jt-clock"><span class="jt-dotlive"></span><span id="jtClock">--:--:--</span></span>
+      </div>
+      <div class="jt-bac">
+        <div><div class="lbl">المتبقي على البكالوريا</div><div class="note">تاريخ تقديري — يُضبط عند إعلان الوزارة</div></div>
+        <div style="text-align:left"><span class="num" id="jtBacDays">0</span> <span class="lbl">يومًا</span></div>
+      </div>
+      <div class="jt-live" id="jtLiveCard">
+        <div class="state"><span class="jt-dotlive"></span><span id="jtState">الآن</span></div>
+        <div class="main">
+          <div class="jt-ringwrap">
+            <svg width="90" height="90"><circle class="jt-ringbg" cx="45" cy="45" r="37"></circle><circle class="jt-ringfg" id="jtRingFg" cx="45" cy="45" r="37"></circle></svg>
+            <div class="jt-ringtxt"><b id="jtRingPct">0%</b><span>من الحصة</span></div>
+          </div>
+          <div style="flex:1">
+            <div class="subj" id="jtSubj">—</div>
+            <div class="time" id="jtTime">—</div>
+            <div class="remain" id="jtRemain">—</div>
+          </div>
+        </div>
+        <div class="jt-timeline">
+          <div class="jt-tl-track" id="jtTlTrack"></div>
+          <div class="jt-tl-labels"><span>08:00</span><span>10:00</span><span>12:00</span><span>14:00</span></div>
+        </div>
+        <div class="next" id="jtNext">—</div>
+      </div>
+      <div class="jt-tabs">
+        <button id="jtTabDay" class="on" onclick="jtShow('day')">اليوم</button>
+        <button id="jtTabTom" onclick="jtShow('tom')">غدًا</button>
+        <button id="jtTabWeek" onclick="jtShow('week')">الأسبوع</button>
+      </div>
+      <div class="jt-panel" id="jtPanel"></div>
+    </div>
+  </div>
 </div>
 <footer>موقع لطلاب الآداب العصرية — سنة الباكالوريا — ثانوية عرفات 3 · النصوص منقولة كما هي من الكتب الرسمية المعتمدة للشعبة، وأي خطأ فيها مصدره الكتاب الأصلي نفسه · الموقع قيد التطوير — للاستفسار أو اقتراح: واتساب <a href="https://wa.me/22227798492">27798492</a></footer>
 <script>
@@ -383,7 +495,31 @@ function renderLesson(L){
   box.querySelectorAll(".toc button").forEach(function(b){ b.onclick=function(){ var el=document.getElementById("sec"+b.getAttribute("data-sec")); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}) } });
   setTimeout(function(){ if(!sheetGet(L.id)) fetchSheet(L); ensureLibs() },1800);
 }
-function goHome(){ $("#lesson").style.display="none"; $("#home").style.display="block"; $("#prog").style.display="none"; window.scrollTo(0,0) }
+function goHome(){ $("#lesson").style.display="none"; var jw=$("#jadwal"); if(jw)jw.style.display="none"; if(window.jtTimer){clearInterval(jtTimer); jtTimer=null} $("#home").style.display="block"; $("#prog").style.display="none"; window.scrollTo(0,0) }
+/* ===== جدولي — جدول قسم 7A (أكّده قاسم 2026-11-11) ===== */
+var JT_COL={"التاريخ":"#f5a623","الفلسفة":"#a78bfa","العربية":"#f472b6","الفرنسية":"#4f8cff","الإنجليزية":"#38bdf8","الرياضيات":"#fb7185","التربية الإسلامية":"#34d399"};
+var JT_DAYS=["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+var JT_TT={0:[],1:[["التاريخ","08:00","10:00"]],2:[["الفلسفة","08:00","10:00"],["العربية","10:00","12:00"]],3:[["الفلسفة","08:00","10:00"],["التاريخ","10:00","12:00"],["الفلسفة","12:00","14:00"]],4:[["الإنجليزية","08:00","10:00"],["الرياضيات","10:00","12:00"],["الفرنسية","12:00","14:00"]],5:[["العربية","08:00","10:00"]],6:[["العربية","08:00","10:00"],["الفرنسية","10:00","12:00"],["التربية الإسلامية","12:00","14:00"]]};
+var JT_BAC=new Date(2027,5,14,8,0,0);
+var jtView="day", jtTimer=null, jtBacShown=false, JT_CIRC=2*Math.PI*37;
+function jtMins(t){var p=t.split(":");return (+p[0])*60+(+p[1])}
+function jtNowM(d){return d.getHours()*60+d.getMinutes()+d.getSeconds()/60}
+function jtPad(n){return (n<10?"0":"")+n}
+function jtRemain(m){if(m<60)return Math.round(m)+" دقيقة";var h=Math.floor(m/60),r=Math.round(m%60);return h+" ساعة"+(r?" و"+r+" دقيقة":"")}
+function jtRow(b,cls,tag,delay){return '<div class="jt-row '+(cls||"")+'" style="--jtrc:'+JT_COL[b[0]]+';animation-delay:'+(delay||0)+'s"><span class="jt-dot" style="background:'+JT_COL[b[0]]+'"></span><span class="s">'+b[0]+'</span>'+(tag?'<span class="tag">'+tag+'</span>':"")+'<span class="t">'+b[1]+" – "+b[2]+"</span></div>"}
+function jtDayList(dayIdx,withNow){var list=JT_TT[dayIdx]||[];if(!list.length)return '<div class="jt-empty">لا حصص في هذا اليوم 🎉</div>';var d=new Date(),nm=jtNowM(d),html="";for(var i=0;i<list.length;i++){var cls="",tag="";if(withNow&&dayIdx===d.getDay()){if(nm>=jtMins(list[i][1])&&nm<jtMins(list[i][2])){cls="now";tag="الآن"}else if(nm>=jtMins(list[i][2])){cls="past"}}html+=jtRow(list[i],cls,tag,i*0.07)}return html}
+function jtShow(v){jtView=v;document.getElementById("jtTabDay").className=v==="day"?"on":"";document.getElementById("jtTabTom").className=v==="tom"?"on":"";document.getElementById("jtTabWeek").className=v==="week"?"on":"";var d=new Date(),p=document.getElementById("jtPanel");p.className="jt-panel anim";if(v==="day"){p.innerHTML=jtDayList(d.getDay(),true)}else if(v==="tom"){p.innerHTML=jtDayList((d.getDay()+1)%7,false)}else{var order=[1,2,3,4,5,6,0],html="";for(var k=0;k<order.length;k++){var di=order[k];html+='<div class="jt-dayblk"><h3>'+JT_DAYS[di]+(di===d.getDay()?'<span class="todaytag">اليوم</span>':"")+"</h3>"+jtDayList(di,di===d.getDay())+"</div>"}p.innerHTML=html}}
+function jtBuildTL(day){var list=JT_TT[day]||[],track=document.getElementById("jtTlTrack"),html="";for(var i=0;i<list.length;i++){var l=(jtMins(list[i][1])-480)/360*100,w=(jtMins(list[i][2])-jtMins(list[i][1]))/360*100;html+='<span class="jt-tl-seg" style="left:'+l+'%;width:'+w+'%;background:'+JT_COL[list[i][0]]+'"></span>'}track.innerHTML=html+'<span class="jt-tl-now" id="jtTlNow" style="left:0%"></span>'}
+function jtTick(){var d=new Date(),nm=jtNowM(d),day=d.getDay();var ck=document.getElementById("jtClock");if(!ck)return;ck.textContent=jtPad(d.getHours())+":"+jtPad(d.getMinutes())+":"+jtPad(d.getSeconds());document.getElementById("jtTodayLine").textContent=JT_DAYS[day]+" · "+d.toLocaleDateString("ar",{day:"numeric",month:"long",year:"numeric"});var target=Math.max(0,Math.ceil((JT_BAC-d)/86400000));var bacEl=document.getElementById("jtBacDays");if(!jtBacShown){jtBacShown=true;var start=null;function step(ts){if(!start)start=ts;var p=Math.min(1,(ts-start)/1400);bacEl.textContent=Math.round(target*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(step)}requestAnimationFrame(step)}else{bacEl.textContent=target}
+var list=JT_TT[day]||[],cur=null,nxt=null,i;for(i=0;i<list.length;i++){if(nm>=jtMins(list[i][1])&&nm<jtMins(list[i][2]))cur=list[i];else if(nm<jtMins(list[i][1])&&!nxt)nxt=list[i]}
+var st=document.getElementById("jtState"),sj=document.getElementById("jtSubj"),tm=document.getElementById("jtTime"),rm=document.getElementById("jtRemain"),nx=document.getElementById("jtNext"),ring=document.getElementById("jtRingFg"),pctEl=document.getElementById("jtRingPct"),card=document.getElementById("jtLiveCard");ring.style.strokeDasharray=JT_CIRC;
+if(cur){st.textContent="الحصة الجارية الآن";sj.textContent=cur[0];sj.style.color=JT_COL[cur[0]];tm.textContent=cur[1]+" – "+cur[2];var pct=(nm-jtMins(cur[1]))/(jtMins(cur[2])-jtMins(cur[1]));ring.style.strokeDashoffset=JT_CIRC*(1-pct);ring.style.stroke=JT_COL[cur[0]];pctEl.textContent=Math.floor(pct*100)+"%";card.style.setProperty("--jtglow",JT_COL[cur[0]]+"40");rm.textContent="تبقّى "+jtRemain(jtMins(cur[2])-nm)+" على نهاية الحصة"}
+else{st.textContent="الآن";sj.textContent=list.length?"لا حصة جارية":"يوم عطلة";sj.style.color="#152a4e";tm.textContent=list.length?"استراحة بين الحصص أو خارج أوقات الدراسة":"لا حصص اليوم";ring.style.strokeDashoffset=JT_CIRC;ring.style.stroke="#f3c34d";pctEl.textContent="—";rm.textContent=""}
+if(nxt){nx.innerHTML="الحصة القادمة: <b>"+nxt[0]+"</b> · "+nxt[1]+" (بعد "+jtRemain(jtMins(nxt[1])-nm)+")"}else{var td=(day+1)%7,tl=JT_TT[td]||[];if(tl.length)nx.innerHTML="انتهت حصص اليوم · أول حصة غدًا ("+JT_DAYS[td]+"): <b>"+tl[0][0]+"</b> · "+tl[0][1];else nx.innerHTML="انتهت حصص اليوم"}
+var needle=document.getElementById("jtTlNow");if(needle){var pos=(nm-480)/360*100;needle.style.left=Math.max(0,Math.min(100,pos))+"%";needle.style.opacity=(nm>=480&&nm<=840)?"1":"0"}
+if(jtView==="day"&&Math.floor(nm)!==jtTick._lm){jtTick._lm=Math.floor(nm);jtShow("day")}}
+function openJadwal(){$("#home").style.display="none";$("#lesson").style.display="none";$("#jadwal").style.display="block";window.scrollTo(0,0);jtBuildTL(new Date().getDay());jtShow("day");jtTick();if(jtTimer)clearInterval(jtTimer);jtTimer=setInterval(jtTick,1000)}
+function closeJadwal(){if(jtTimer){clearInterval(jtTimer);jtTimer=null}$("#jadwal").style.display="none";$("#home").style.display="block";window.scrollTo(0,0)}
 window.addEventListener("scroll",function(){ if($("#prog").style.display!=="block")return; var d=document.documentElement; var p=d.scrollTop/(d.scrollHeight-d.clientHeight||1); $("#prog").style.width=(p*100)+"%" });
 function stripCJ(s){ return (s||"").replace(/[㐀-䶿一-鿿豈-﫿぀-ヿ가-힯]/g,"").replace(/([.؟!])\s*،\s*/g,"$1 ") }
 function askAI(payload,ansEl,btn){
